@@ -801,6 +801,92 @@ app.get('/relatorios/veiculo/:id/detalhado', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 💰 RELATÓRIO: Financeiro Geral
+// --------------------------------------
+
+app.get('/relatorios/financeiro', async (req, res) => {
+  try {
+    const { inicio, fim } = req.query;
+
+    if (!inicio || !fim) {
+      return res.status(400).json({
+        error: "Parâmetros 'inicio' e 'fim' são obrigatórios (AAAA-MM-DD)"
+      });
+    }
+
+    const params = [
+      `${inicio} 00:00:00`,
+      `${fim} 23:59:59`
+    ];
+
+    // ---------------------------------
+    // 1️⃣ Totais gerais
+    // ---------------------------------
+    const totaisSql = `
+      SELECT
+        COUNT(a.id) AS total_aulas,
+        COALESCE(SUM(a.valor), 0) AS total_movimentado,
+        COALESCE(SUM(a.repasse_instrutor), 0) AS total_instrutor,
+        COALESCE(SUM(a.repasse_proprietario), 0) AS total_proprietario,
+        COALESCE(SUM(a.repasse_app), 0) AS total_app
+      FROM habilitaplus.aulas a
+      WHERE a.data_hora BETWEEN $1 AND $2
+    `;
+
+    const totais = await pool.query(totaisSql, params);
+
+    // ---------------------------------
+    // 2️⃣ Totais por instrutor
+    // ---------------------------------
+    const instrutoresSql = `
+      SELECT
+        i.id,
+        i.nome,
+        COUNT(a.id) AS total_aulas,
+        COALESCE(SUM(a.repasse_instrutor), 0) AS total_instrutor
+      FROM habilitaplus.aulas a
+      JOIN habilitaplus.instrutores i ON i.id = a.instrutor_id
+      WHERE a.data_hora BETWEEN $1 AND $2
+      GROUP BY i.id, i.nome
+      ORDER BY total_instrutor DESC
+    `;
+
+    const instrutores = await pool.query(instrutoresSql, params);
+
+    // ---------------------------------
+    // 3️⃣ Totais por proprietário
+    // ---------------------------------
+    const proprietariosSql = `
+      SELECT
+        p.id,
+        p.nome,
+        COUNT(a.id) AS total_aulas,
+        COALESCE(SUM(a.repasse_proprietario), 0) AS total_proprietario
+      FROM habilitaplus.aulas a
+      JOIN habilitaplus.proprietarios p ON p.id = a.proprietario_id
+      WHERE a.data_hora BETWEEN $1 AND $2
+      GROUP BY p.id, p.nome
+      ORDER BY total_proprietario DESC
+    `;
+
+    const proprietarios = await pool.query(proprietariosSql, params);
+
+
+    // ---------------------------------
+    // 📤 ENVIA O RESULTADO
+    // ---------------------------------
+    res.json({
+      periodo: { inicio, fim },
+      totais_gerais: totais.rows[0],
+      por_instrutor: instrutores.rows,
+      por_proprietario: proprietarios.rows
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
