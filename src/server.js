@@ -131,3 +131,89 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 HabilitaPlus API rodando na porta ${PORT}`);
 });
+// Atualizar instrutor
+app.put('/instrutores/:id', async (req, res) => {
+  try {
+    const { nome, telefone, ativo } = req.body;
+
+    const result = await pool.query(
+      `UPDATE habilitaplus.instrutores 
+       SET nome = $1, telefone = $2, ativo = $3
+       WHERE id = $4
+       RETURNING *`,
+      [nome, telefone, ativo, req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Instrutor não encontrado" });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// Deletar instrutor
+app.delete('/instrutores/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'DELETE FROM habilitaplus.instrutores WHERE id = $1 RETURNING *',
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Instrutor não encontrado" });
+    }
+
+    res.json({ message: "Instrutor removido com sucesso", deletado: result.rows[0] });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// Filtrar instrutores ativos/inativos
+app.get('/instrutores', async (req, res) => {
+  try {
+    const { ativo } = req.query;
+
+    let query = 'SELECT * FROM habilitaplus.instrutores';
+    let params = [];
+
+    if (ativo !== undefined) {
+      query += ' WHERE ativo = $1';
+      params.push(ativo === "true");
+    }
+
+    const result = await pool.query(query, params);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// Alterar status (ativo/inativo)
+app.patch('/instrutores/:id/status', async (req, res) => {
+  try {
+    const { ativo } = req.body;
+
+    const result = await pool.query(
+      `UPDATE habilitaplus.instrutores
+       SET ativo = $1
+       WHERE id = $2
+       RETURNING *`,
+      [ativo, req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Instrutor não encontrado" });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
