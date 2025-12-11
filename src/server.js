@@ -40,19 +40,19 @@ app.get('/instrutores/:id', async (req, res) => {
   }
 });
 
-// Criar instrutor
+// 📌 Criar instrutor
 app.post('/instrutores', async (req, res) => {
-  const { nome, telefone, documento, status } = req.body;
-
   try {
+    const { nome, telefone, ativo } = req.body;
+
     const result = await pool.query(
-      `INSERT INTO habilitaplus.instrutores (nome, telefone, documento, status)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO habilitaplus.instrutores (nome, telefone, ativo)
+       VALUES ($1, $2, $3)
        RETURNING *`,
-      [nome, telefone, documento, status || 'ativo']
+      [nome, telefone, ativo ?? true]
     );
 
-    res.status(201).json(result.rows[0]);
+    res.json(result.rows[0]);
 
   } catch (err) {
     res.status(500).json({ error: err.message });
