@@ -216,4 +216,108 @@ app.patch('/instrutores/:id/status', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// =============================
+// 📍 ALUNOS
+// =============================
+
+// Listar todos os alunos
+app.get('/alunos', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.alunos ORDER BY id'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Buscar aluno por ID
+app.get('/alunos/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.alunos WHERE id = $1',
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Aluno não encontrado' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Criar aluno
+app.post('/alunos', async (req, res) => {
+  try {
+    const {
+      nome,
+      cpf,
+      telefone,
+      email,
+      categoria_cnh,
+      status
+    } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO habilitaplus.alunos 
+        (nome, cpf, telefone, email, categoria_cnh, status, data_cadastro)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())
+       RETURNING *`,
+      [nome, cpf, telefone, email, categoria_cnh, status ?? 'ativo']
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Atualizar aluno
+app.put('/alunos/:id', async (req, res) => {
+  try {
+    const {
+      nome,
+      cpf,
+      telefone,
+      email,
+      categoria_cnh,
+      status
+    } = req.body;
+
+    const result = await pool.query(
+      `UPDATE habilitaplus.alunos
+       SET nome = $1,
+           cpf = $2,
+           telefone = $3,
+           email = $4,
+           categoria_cnh = $5,
+           status = $6
+       WHERE id = $7
+       RETURNING *`,
+      [nome, cpf, telefone, email, categoria_cnh, status, req.params.id]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deletar aluno
+app.delete('/alunos/:id', async (req, res) => {
+  try {
+    await pool.query(
+      'DELETE FROM habilitaplus.alunos WHERE id = $1',
+      [req.params.id]
+    );
+
+    res.json({ message: 'Aluno removido com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
