@@ -801,9 +801,9 @@ app.get('/relatorios/veiculo/:id/detalhado', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// --------------------------------------
-// 💰 RELATÓRIO: Financeiro Geral
-// --------------------------------------
+// -------------------------------------------------------
+// 📊 RELATÓRIOS FINANCEIROS
+// -------------------------------------------------------
 
 app.get('/relatorios/financeiro', async (req, res) => {
   try {
@@ -811,67 +811,79 @@ app.get('/relatorios/financeiro', async (req, res) => {
 
     if (!inicio || !fim) {
       return res.status(400).json({
-        error: "Parâmetros 'inicio' e 'fim' são obrigatórios (AAAA-MM-DD)"
+        error: "Você deve enviar ?inicio=YYYY-MM-DD&fim=YYYY-MM-DD"
       });
     }
 
-    const params = [
-      `${inicio} 00:00:00`,
-      `${fim} 23:59:59`
-    ];
-
-    // ---------------------------------
-    // 1️⃣ Totais gerais
-    // ---------------------------------
-    const totaisSql = `
-      SELECT
-        COUNT(a.id) AS total_aulas,
-        COALESCE(SUM(a.valor), 0) AS total_movimentado,
-        COALESCE(SUM(a.repasse_instrutor), 0) AS total_instrutor,
-        COALESCE(SUM(a.repasse_proprietario), 0) AS total_proprietario,
-        COALESCE(SUM(a.repasse_app), 0) AS total_app
+    // ---------------------------------------------
+    // 1️⃣ TOTAL GERAL DO PERÍODO
+    // ---------------------------------------------
+    const totalGeral = await pool.query(
+      `
+      SELECT 
+        SUM(a.valor) AS total_recebido,
+        SUM(a.repasse_instrutor) AS total_instrutores,
+        SUM(a.repasse_proprietario) AS total_proprietarios,
+        SUM(a.repasse_app) AS total_app
       FROM habilitaplus.aulas a
-      WHERE a.data_hora BETWEEN $1 AND $2
-    `;
+      JOIN habilitaplus.veiculos v ON v.id = a.veiculo_id
+      JOIN habilitaplus.proprietarios p ON p.id = v.proprietario_id
+      WHERE a.data_hora BETWEEN $1 AND $2;
+      `,
+      [inicio, fim]
+    );
 
-    const totais = await pool.query(totaisSql, params);
-
-    // ---------------------------------
-    // 2️⃣ Totais por instrutor
-    // ---------------------------------
-    const instrutoresSql = `
-      SELECT
-        i.id,
-        i.nome,
-        COUNT(a.id) AS total_aulas,
-        COALESCE(SUM(a.repasse_instrutor), 0) AS total_instrutor
+    // ---------------------------------------------
+    // 2️⃣ TOTAL POR INSTRUTOR
+    // ---------------------------------------------
+    const porInstrutor = await pool.query(
+      `
+      SELECT 
+        i.nome AS instrutor,
+        SUM(a.valor) AS total_recebido,
+        SUM(a.repasse_instrutor) AS repasse_instrutor
       FROM habilitaplus.aulas a
       JOIN habilitaplus.instrutores i ON i.id = a.instrutor_id
       WHERE a.data_hora BETWEEN $1 AND $2
-      GROUP BY i.id, i.nome
-      ORDER BY total_instrutor DESC
-    `;
+      GROUP BY i.nome
+      ORDER BY total_recebido DESC;
+      `,
+      [inicio, fim]
+    );
 
-    const instrutores = await pool.query(instrutoresSql, params);
-
-    // ---------------------------------
-    // 3️⃣ Totais por proprietário
-    // ---------------------------------
-    const proprietariosSql = `
+    // ---------------------------------------------
+    // 3️⃣ TOTAL POR PROPRIETÁRIO
+    // ---------------------------------------------
+    const porProprietario = await pool.query(
+      `
       SELECT
-        p.id,
-        p.nome,
-        COUNT(a.id) AS total_aulas,
-        COALESCE(SUM(a.repasse_proprietario), 0) AS total_proprietario
+        p.nome AS proprietario,
+        SUM(a.repasse_proprietario) AS repasse_proprietario
       FROM habilitaplus.aulas a
-      JOIN habilitaplus.proprietarios p ON p.id = a.proprietario_id
+      JOIN habilitaplus.veiculos v ON v.id = a.veiculo_id
+      JOIN habilitaplus.proprietarios p ON p.id = v.proprietario_id
       WHERE a.data_hora BETWEEN $1 AND $2
-      GROUP BY p.id, p.nome
-      ORDER BY total_proprietario DESC
-    `;
+      GROUP BY p.nome
+      ORDER BY repasse_proprietario DESC;
+      `,
+      [inicio, fim]
+    );
 
-    const proprietarios = await pool.query(proprietariosSql, params);
+    // ---------------------------------------------
+    // 📤 RESPOSTA FINAL
+    // ---------------------------------------------
+    res.json({
+      periodo: { inicio, fim },
+      total_geral: totalGeral.rows[0],
+      por_instrutor: porInstrutor.rows,
+      por_proprietario: porProprietario.rows
+    });
 
+  } catch (err) {
+    console.error("Erro no relatório financeiro:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
     // ---------------------------------
     // 📤 ENVIA O RESULTADO
