@@ -386,6 +386,88 @@ app.delete('/proprietarios/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 🚗 ROTAS DE VEÍCULOS
+// --------------------------------------
+
+// Listar todos os veículos
+app.get('/veiculos', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM habilitaplus.veiculos ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Buscar veículo por ID
+app.get('/veiculos/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.veiculos WHERE id = $1',
+      [req.params.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Veículo não encontrado' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Criar veículo
+app.post('/veiculos', async (req, res) => {
+  try {
+    const { proprietario_id, instrutor_id, modelo, placa, ano, tipo, status } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO habilitaplus.veiculos 
+       (proprietario_id, instrutor_id, modelo, placa, ano, tipo, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING *`,
+      [proprietario_id, instrutor_id, modelo, placa, ano, tipo, status ?? 'ativo']
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Atualizar veículo
+app.put('/veiculos/:id', async (req, res) => {
+  try {
+    const { proprietario_id, instrutor_id, modelo, placa, ano, tipo, status } = req.body;
+
+    const result = await pool.query(
+      `UPDATE habilitaplus.veiculos
+       SET proprietario_id = $1, instrutor_id = $2, modelo = $3, placa = $4,
+           ano = $5, tipo = $6, status = $7
+       WHERE id = $8 RETURNING *`,
+      [proprietario_id, instrutor_id, modelo, placa, ano, tipo, status, req.params.id]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deletar veículo
+app.delete('/veiculos/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM habilitaplus.veiculos WHERE id = $1', [
+      req.params.id,
+    ]);
+
+    res.json({ message: 'Veículo removido com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
