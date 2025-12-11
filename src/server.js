@@ -10,6 +10,88 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+// =============================
+// 📍 INSTRUTORES
+// =============================
+
+// Listar todos os instrutores
+app.get('/instrutores', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM habilitaplus.instrutores ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Buscar instrutor por ID
+app.get('/instrutores/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.instrutores WHERE id = $1',
+      [req.params.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Instrutor não encontrado' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Criar instrutor
+app.post('/instrutores', async (req, res) => {
+  const { nome, telefone, documento, status } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO habilitaplus.instrutores (nome, telefone, documento, status)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [nome, telefone, documento, status || 'ativo']
+    );
+
+    res.status(201).json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Atualizar instrutor
+app.put('/instrutores/:id', async (req, res) => {
+  const { nome, telefone, documento, status } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE habilitaplus.instrutores 
+       SET nome = $1, telefone = $2, documento = $3, status = $4
+       WHERE id = $5 RETURNING *`,
+      [nome, telefone, documento, status, req.params.id]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deletar instrutor
+app.delete('/instrutores/:id', async (req, res) => {
+  try {
+    await pool.query(
+      'DELETE FROM habilitaplus.instrutores WHERE id = $1',
+      [req.params.id]
+    );
+
+    res.json({ message: 'Instrutor removido com sucesso' });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // -------------------------------
 // 🔗 Conexão com o PostgreSQL
