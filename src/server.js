@@ -884,6 +884,54 @@ app.get('/relatorios/financeiro', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 📊 RELATÓRIO DE AULAS POR ALUNO
+// --------------------------------------
+
+app.get('/relatorios/aluno/:id', async (req, res) => {
+  const alunoId = req.params.id;
+
+  try {
+    const query = `
+      SELECT 
+        a.id AS aula_id,
+        a.data_hora,
+        a.duracao,
+        a.valor,
+        i.nome AS instrutor,
+        v.modelo AS veiculo,
+        p.nome AS pacote,
+        a.repasse_instrutor,
+        a.repasse_proprietario,
+        a.repasse_app
+      FROM habilitaplus.aulas a
+      LEFT JOIN habilitaplus.instrutores i ON a.instrutor_id = i.id
+      LEFT JOIN habilitaplus.veiculos v ON a.veiculo_id = v.id
+      LEFT JOIN habilitaplus.pacotes p ON a.pacote_id = p.id
+      WHERE a.aluno_id = $1
+      ORDER BY a.data_hora ASC
+    `;
+
+    const aulas = await pool.query(query, [alunoId]);
+
+    const resumo = {
+      total_aulas: aulas.rowCount,
+      horas_total: aulas.rows.reduce((acc, aula) => acc + aula.duracao, 0),
+      instrutores: [...new Set(aulas.rows.map(a => a.instrutor))],
+      veiculos: [...new Set(aulas.rows.map(a => a.veiculo))],
+      pacotes_usados: [...new Set(aulas.rows.map(a => a.pacote))],
+    };
+
+    res.json({
+      aluno_id: alunoId,
+      resumo,
+      aulas: aulas.rows
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
