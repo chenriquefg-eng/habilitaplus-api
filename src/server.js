@@ -106,6 +106,94 @@ app.delete('/instrutores/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// =============================
+// 📍 PACOTES
+// =============================
+
+// Listar todos os pacotes
+app.get('/pacotes', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.pacotes ORDER BY id'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Buscar pacote por ID
+app.get('/pacotes/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.pacotes WHERE id = $1',
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Pacote não encontrado' });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Criar novo pacote
+app.post('/pacotes', async (req, res) => {
+  try {
+    const { nome, quantidade_aulas, valor, ativo } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO habilitaplus.pacotes (nome, quantidade_aulas, valor, ativo)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [nome, quantidade_aulas, valor, ativo ?? true]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Atualizar pacote
+app.put('/pacotes/:id', async (req, res) => {
+  try {
+    const { nome, quantidade_aulas, valor, ativo } = req.body;
+
+    const result = await pool.query(
+      `UPDATE habilitaplus.pacotes 
+       SET nome = $1, quantidade_aulas = $2, valor = $3, ativo = $4
+       WHERE id = $5
+       RETURNING *`,
+      [nome, quantidade_aulas, valor, ativo, req.params.id]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deletar pacote
+app.delete('/pacotes/:id', async (req, res) => {
+  try {
+    await pool.query(
+      'DELETE FROM habilitaplus.pacotes WHERE id = $1',
+      [req.params.id]
+    );
+
+    res.json({ message: 'Pacote removido com sucesso' });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
