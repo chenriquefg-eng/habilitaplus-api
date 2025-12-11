@@ -3,18 +3,32 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import pkg from 'pg';
 
-const { Pool } = pkg;
-
 dotenv.config();
 
+const { Pool } = pkg;
 const app = express();
+
 app.use(cors());
 app.use(express.json());
-// =============================
-// 📍 INSTRUTORES
-// =============================
 
-// Listar todos os instrutores
+// ---------------------------------------
+// 🔗 Conexão PostgreSQL (precisa vir antes das rotas)
+// ---------------------------------------
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+pool.connect()
+  .then(() => console.log("🟢 Conectado ao PostgreSQL com sucesso!"))
+  .catch(err => console.error("🔴 Erro ao conectar ao PostgreSQL:", err));
+
+// ---------------------------------------
+// 📍 ROTAS DE INSTRUTORES
+// ---------------------------------------
 app.get('/instrutores', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM habilitaplus.instrutores ORDER BY id');
@@ -24,23 +38,25 @@ app.get('/instrutores', async (req, res) => {
   }
 });
 
-// Buscar instrutor por ID
 app.get('/instrutores/:id', async (req, res) => {
   try {
     const result = await pool.query(
       'SELECT * FROM habilitaplus.instrutores WHERE id = $1',
       [req.params.id]
     );
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Instrutor não encontrado' });
     }
+
     res.json(result.rows[0]);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// 📌 Criar instrutor
+// 👉 ESTE É O POST QUE NÃO ESTAVA FUNCIONANDO
 app.post('/instrutores', async (req, res) => {
   try {
     const { nome, telefone, ativo } = req.body;
@@ -59,7 +75,6 @@ app.post('/instrutores', async (req, res) => {
   }
 });
 
-// Atualizar instrutor
 app.put('/instrutores/:id', async (req, res) => {
   const { nome, telefone, documento, status } = req.body;
 
@@ -78,7 +93,6 @@ app.put('/instrutores/:id', async (req, res) => {
   }
 });
 
-// Deletar instrutor
 app.delete('/instrutores/:id', async (req, res) => {
   try {
     await pool.query(
@@ -93,28 +107,13 @@ app.delete('/instrutores/:id', async (req, res) => {
   }
 });
 
-// -------------------------------
-// 🔗 Conexão com o PostgreSQL
-// -------------------------------
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
-
-// Testar conexão na inicialização
-pool.connect()
-  .then(() => console.log("🟢 Conectado ao PostgreSQL com sucesso!"))
-  .catch(err => console.error("🔴 Erro ao conectar ao PostgreSQL:", err));
-
-// Endpoint de teste da API
+// ---------------------------------------
+// ENDPOINTS DE TESTE
+// ---------------------------------------
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', app: 'HabilitaPlus API' });
 });
 
-// Endpoint para testar acesso ao banco
 app.get('/db-test', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
@@ -124,9 +123,9 @@ app.get('/db-test', async (req, res) => {
   }
 });
 
-// -------------------------------
-// 🚀 Subir servidor
-// -------------------------------
+// ---------------------------------------
+// 🚀 SUBIR SERVIDOR
+// ---------------------------------------
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
