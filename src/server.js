@@ -304,6 +304,112 @@ app.delete('/veiculos/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 👨‍🎓 ROTAS DE ALUNOS
+// --------------------------------------
+
+// Listar todos os alunos
+app.get('/alunos', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.alunos ORDER BY id'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Buscar aluno por ID
+app.get('/alunos/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.alunos WHERE id = $1',
+      [req.params.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Aluno não encontrado' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Criar aluno
+app.post('/alunos', async (req, res) => {
+  try {
+    const { nome, telefone, cpf, renach, data_nascimento, categoria } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO habilitaplus.alunos 
+       (nome, telefone, cpf, renach, data_nascimento, categoria, 
+        biometria_validada, processo_ativo)
+       VALUES ($1, $2, $3, $4, $5, $6, false, false)
+       RETURNING *`,
+      [nome, telefone, cpf, renach, data_nascimento, categoria]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Atualizar aluno
+app.put('/alunos/:id', async (req, res) => {
+  try {
+    const {
+      nome,
+      telefone,
+      cpf,
+      renach,
+      data_nascimento,
+      categoria,
+      biometria_validada,
+      processo_ativo
+    } = req.body;
+
+    const result = await pool.query(
+      `UPDATE habilitaplus.alunos
+       SET nome=$1, telefone=$2, cpf=$3, renach=$4, data_nascimento=$5,
+           categoria=$6, biometria_validada=$7, processo_ativo=$8
+       WHERE id=$9
+       RETURNING *`,
+      [
+        nome,
+        telefone,
+        cpf,
+        renach,
+        data_nascimento,
+        categoria,
+        biometria_validada,
+        processo_ativo,
+        req.params.id
+      ]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deletar aluno
+app.delete('/alunos/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM habilitaplus.alunos WHERE id=$1', [
+      req.params.id,
+    ]);
+    res.json({ message: 'Aluno removido com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // ---------------------------------------------
 // 📍 ROTAS DE PROPRIETÁRIOS
 // ---------------------------------------------
