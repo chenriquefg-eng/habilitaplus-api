@@ -664,6 +664,57 @@ app.get('/relatorios/instrutor/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 📊 RELATÓRIO: Aulas por Veículo (RESUMO)
+// --------------------------------------
+
+app.get('/relatorios/veiculo/:id', async (req, res) => {
+  try {
+    const veiculoId = req.params.id;
+    const { inicio, fim } = req.query;
+
+    if (!inicio || !fim) {
+      return res.status(400).json({
+        error: "Parâmetros 'inicio' e 'fim' são obrigatórios (AAAA-MM-DD)"
+      });
+    }
+
+    const sql = `
+      SELECT 
+        v.modelo,
+        v.placa,
+        v.tipo,
+        COUNT(a.id) AS total_aulas,
+        COALESCE(SUM(a.repasse_instrutor), 0) AS total_instrutor,
+        COALESCE(SUM(a.repasse_proprietario), 0) AS total_proprietario,
+        COALESCE(SUM(a.repasse_app), 0) AS total_app,
+        COALESCE(SUM(a.valor), 0) AS total_movimentado
+      FROM habilitaplus.aulas a
+      JOIN habilitaplus.veiculos v ON v.id = a.veiculo_id
+      WHERE a.veiculo_id = $1
+        AND a.data_hora BETWEEN $2 AND $3
+      GROUP BY v.modelo, v.placa, v.tipo
+    `;
+
+    const result = await pool.query(sql, [
+      veiculoId,
+      `${inicio} 00:00:00`,
+      `${fim} 23:59:59`
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.json({
+        veiculo_id: veiculoId,
+        mensagem: "Nenhuma aula encontrada no período informado."
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
