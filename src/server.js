@@ -932,6 +932,68 @@ app.get('/relatorios/aluno/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 📊 RELATÓRIO POR INSTRUTOR
+// --------------------------------------
+app.get('/relatorios/instrutor/:id', async (req, res) => {
+  try {
+    const instrutorId = req.params.id;
+    const { inicio, fim } = req.query;
+
+    const result = await pool.query(
+      `
+      SELECT 
+        i.nome AS instrutor,
+        COUNT(a.id) AS total_aulas,
+        SUM(a.duracao) AS total_minutos,
+        SUM(a.valor) AS total_valor,
+        SUM(a.repasse_instrutor) AS total_repasse_instrutor,
+        SUM(a.repasse_proprietario) AS total_repasse_proprietario,
+        SUM(a.repasse_app) AS total_repasse_app
+      FROM habilitaplus.aulas a
+      JOIN habilitaplus.instrutores i ON i.id = a.instrutor_id
+      WHERE a.instrutor_id = $1
+      AND a.data_hora BETWEEN $2 AND $3
+      `,
+      [instrutorId, inicio, fim]
+    );
+
+    const aulasDetalhadas = await pool.query(
+      `
+      SELECT 
+        a.id,
+        a.data_hora,
+        a.duracao,
+        a.valor,
+        a.status,
+        al.nome AS aluno,
+        v.modelo AS veiculo,
+        p.nome AS pacote,
+        a.repasse_instrutor,
+        a.repasse_proprietario,
+        a.repasse_app
+      FROM habilitaplus.aulas a
+      LEFT JOIN habilitaplus.alunos al ON al.id = a.aluno_id
+      LEFT JOIN habilitaplus.veiculos v ON v.id = a.veiculo_id
+      LEFT JOIN habilitaplus.pacotes p ON p.id = a.pacote_id
+      WHERE a.instrutor_id = $1
+      AND a.data_hora BETWEEN $2 AND $3
+      ORDER BY a.data_hora ASC
+      `,
+      [instrutorId, inicio, fim]
+    );
+
+    res.json({
+      instrutor_id: instrutorId,
+      periodo: { inicio, fim },
+      resumo: result.rows[0],
+      aulas: aulasDetalhadas.rows
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
