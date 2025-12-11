@@ -715,6 +715,92 @@ app.get('/relatorios/veiculo/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 📊 RELATÓRIO: Aulas por Veículo (DETALHADO)
+// --------------------------------------
+
+app.get('/relatorios/veiculo/:id/detalhado', async (req, res) => {
+  try {
+    const veiculoId = req.params.id;
+    const { inicio, fim } = req.query;
+
+    if (!inicio || !fim) {
+      return res.status(400).json({
+        error: "Parâmetros 'inicio' e 'fim' são obrigatórios (AAAA-MM-DD)"
+      });
+    }
+
+    // ------------------------
+    // Totais do veículo
+    // ------------------------
+    const resumoSql = `
+      SELECT 
+        v.modelo,
+        v.placa,
+        v.tipo,
+        COUNT(a.id) AS total_aulas,
+        COALESCE(SUM(a.repasse_instrutor), 0) AS total_instrutor,
+        COALESCE(SUM(a.repasse_proprietario), 0) AS total_proprietario,
+        COALESCE(SUM(a.repasse_app), 0) AS total_app,
+        COALESCE(SUM(a.valor), 0) AS total_movimentado
+      FROM habilitaplus.aulas a
+      JOIN habilitaplus.veiculos v ON v.id = a.veiculo_id
+      WHERE a.veiculo_id = $1
+        AND a.data_hora BETWEEN $2 AND $3
+      GROUP BY v.modelo, v.placa, v.tipo
+    `;
+
+    const resumo = await pool.query(resumoSql, [
+      veiculoId,
+      `${inicio} 00:00:00`,
+      `${fim} 23:59:59`
+    ]);
+
+    // Nenhuma aula → retorna somente aviso
+    if (resumo.rows.length === 0) {
+      return res.json({
+        veiculo_id: veiculoId,
+        mensagem: "Nenhuma aula encontrada no período informado."
+      });
+    }
+
+    // ------------------------
+    // Lista detalhada das aulas
+    // ------------------------
+    const detalhesSql = `
+      SELECT
+        a.id,
+        a.data_hora,
+        a.valor,
+        a.repasse_instrutor,
+        a.repasse_proprietario,
+        a.repasse_app,
+        al.nome AS aluno,
+        i.nome AS instrutor
+      FROM habilitaplus.aulas a
+      LEFT JOIN habilitaplus.alunos al ON al.id = a.aluno_id
+      LEFT JOIN habilitaplus.instrutores i ON i.id = a.instrutor_id
+      WHERE a.veiculo_id = $1
+        AND a.data_hora BETWEEN $2 AND $3
+      ORDER BY a.data_hora ASC
+    `;
+
+    const detalhes = await pool.query(detalhesSql, [
+      veiculoId,
+      `${inicio} 00:00:00`,
+      `${fim} 23:59:59`
+    ]);
+
+    // Junta tudo num JSON só
+    res.json({
+      ...resumo.rows[0],
+      aulas: detalhes.rows
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
