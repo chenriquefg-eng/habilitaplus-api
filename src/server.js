@@ -615,6 +615,55 @@ app.delete('/aulas/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 📊 RELATÓRIO: Aulas por Instrutor
+// --------------------------------------
+
+app.get('/relatorios/instrutor/:id', async (req, res) => {
+  try {
+    const instrutorId = req.params.id;
+    const { inicio, fim } = req.query;
+
+    if (!inicio || !fim) {
+      return res.status(400).json({
+        error: "Parâmetros 'inicio' e 'fim' são obrigatórios (AAAA-MM-DD)"
+      });
+    }
+
+    const sql = `
+      SELECT 
+        i.nome AS instrutor,
+        COUNT(a.id) AS total_aulas,
+        COALESCE(SUM(a.repasse_instrutor), 0) AS total_instrutor,
+        COALESCE(SUM(a.repasse_proprietario), 0) AS total_proprietario,
+        COALESCE(SUM(a.repasse_app), 0) AS total_app,
+        COALESCE(SUM(a.valor), 0) AS total_movimentado
+      FROM habilitaplus.aulas a
+      JOIN habilitaplus.instrutores i ON i.id = a.instrutor_id
+      WHERE a.instrutor_id = $1
+        AND a.data_hora BETWEEN $2 AND $3
+      GROUP BY i.nome
+    `;
+
+    const result = await pool.query(sql, [
+      instrutorId,
+      `${inicio} 00:00:00`,
+      `${fim} 23:59:59`
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.json({
+        instrutor_id: instrutorId,
+        mensagem: "Nenhuma aula encontrada no período informado.",
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
