@@ -304,6 +304,88 @@ app.delete('/veiculos/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// ---------------------------------------------
+// 📍 ROTAS DE PROPRIETÁRIOS
+// ---------------------------------------------
+
+// Listar todos os proprietários
+app.get('/proprietarios', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM habilitaplus.proprietarios ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Buscar proprietário por ID
+app.get('/proprietarios/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.proprietarios WHERE id = $1',
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Proprietário não encontrado' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Criar proprietário
+app.post('/proprietarios', async (req, res) => {
+  try {
+    const { nome, telefone, documento, status } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO habilitaplus.proprietarios (nome, telefone, documento, status)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [nome, telefone, documento, status ?? 'ativo']
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Atualizar proprietário
+app.put('/proprietarios/:id', async (req, res) => {
+  try {
+    const { nome, telefone, documento, status } = req.body;
+
+    const result = await pool.query(
+      `UPDATE habilitaplus.proprietarios
+       SET nome = $1, telefone = $2, documento = $3, status = $4
+       WHERE id = $5
+       RETURNING *`,
+      [nome, telefone, documento, status, req.params.id]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deletar proprietário
+app.delete('/proprietarios/:id', async (req, res) => {
+  try {
+    await pool.query(
+      'DELETE FROM habilitaplus.proprietarios WHERE id = $1',
+      [req.params.id]
+    );
+
+    res.json({ message: 'Proprietário removido com sucesso' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
