@@ -468,6 +468,153 @@ app.delete('/veiculos/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 🎓 ROTAS DE AULAS
+// --------------------------------------
+
+// Listar todas as aulas
+app.get('/aulas', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.aulas ORDER BY id'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Buscar aula por ID
+app.get('/aulas/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM habilitaplus.aulas WHERE id = $1',
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Aula não encontrada' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Criar aula
+app.post('/aulas', async (req, res) => {
+  try {
+    const {
+      aluno_id,
+      instrutor_id,
+      veiculo_id,
+      pacote_id,
+      data_hora,
+      duracao,
+      valor,
+      status,
+      repasse_instrutor,
+      repasse_proprietario,
+      repasse_app
+    } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO habilitaplus.aulas 
+       (aluno_id, instrutor_id, veiculo_id, pacote_id, data_hora, duracao, valor, status,
+        repasse_instrutor, repasse_proprietario, repasse_app, data_criacao)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+       RETURNING *`,
+      [
+        aluno_id,
+        instrutor_id,
+        veiculo_id,
+        pacote_id,
+        data_hora,
+        duracao,
+        valor,
+        status ?? 'ativo',
+        repasse_instrutor ?? 0,
+        repasse_proprietario ?? 0,
+        repasse_app ?? 0
+      ]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Atualizar aula
+app.put('/aulas/:id', async (req, res) => {
+  try {
+    const {
+      aluno_id,
+      instrutor_id,
+      veiculo_id,
+      pacote_id,
+      data_hora,
+      duracao,
+      valor,
+      status,
+      repasse_instrutor,
+      repasse_proprietario,
+      repasse_app
+    } = req.body;
+
+    const result = await pool.query(
+      `UPDATE habilitaplus.aulas
+       SET aluno_id = $1,
+           instrutor_id = $2,
+           veiculo_id = $3,
+           pacote_id = $4,
+           data_hora = $5,
+           duracao = $6,
+           valor = $7,
+           status = $8,
+           repasse_instrutor = $9,
+           repasse_proprietario = $10,
+           repasse_app = $11
+       WHERE id = $12
+       RETURNING *`,
+      [
+        aluno_id,
+        instrutor_id,
+        veiculo_id,
+        pacote_id,
+        data_hora,
+        duracao,
+        valor,
+        status,
+        repasse_instrutor,
+        repasse_proprietario,
+        repasse_app,
+        req.params.id
+      ]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Deletar aula
+app.delete('/aulas/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM habilitaplus.aulas WHERE id = $1', [
+      req.params.id,
+    ]);
+
+    res.json({ message: 'Aula removida com sucesso' });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
