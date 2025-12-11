@@ -885,21 +885,6 @@ app.get('/relatorios/financeiro', async (req, res) => {
   }
 });
 
-    // ---------------------------------
-    // 📤 ENVIA O RESULTADO
-    // ---------------------------------
-    res.json({
-      periodo: { inicio, fim },
-      totais_gerais: totais.rows[0],
-      por_instrutor: instrutores.rows,
-      por_proprietario: proprietarios.rows
-    });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // ---------------------------------------
 // ENDPOINTS DE TESTE
 // ---------------------------------------
