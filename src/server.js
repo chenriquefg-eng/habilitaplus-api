@@ -575,6 +575,85 @@ app.delete('/veiculos/:id', async (req, res) => {
   }
 });
 // --------------------------------------
+// 📆 ROTAS DE AGENDAMENTO DE AULAS
+// --------------------------------------
+
+app.post('/aulas', async (req, res) => {
+  try {
+    const { aluno_id, data_hora } = req.body;
+
+    // 1. Verificar se aluno existe
+    const aluno = await pool.query(
+      'SELECT * FROM habilitaplus.alunos WHERE id=$1',
+      [aluno_id]
+    );
+
+    if (aluno.rows.length === 0) {
+      return res.status(404).json({ error: 'Aluno não encontrado' });
+    }
+
+    const dados = aluno.rows[0];
+
+    // 2. Validações obrigatórias (LEI 6707/2024)
+    if (!dados.processo_ativo) {
+      return res.status(403).json({ 
+        error: "Aluno não possui processo ativo no DETRAN." 
+      });
+    }
+
+    if (!dados.biometria_validada) {
+      return res.status(403).json({ 
+        error: "Biometria do aluno não está validada. Não é permitido agendar aula." 
+      });
+    }
+
+    if (!dados.renach || dados.renach.trim() === '') {
+      return res.status(403).json({ 
+        error: "RENACH obrigatório para realizar aulas práticas." 
+      });
+    }
+
+    // 3. Criar aula pendente (instrutores vão aceitar)
+    const novaAula = await pool.query(
+      `INSERT INTO habilitaplus.aulas (aluno_id, data_hora, status)
+       VALUES ($1, $2, 'pendente')
+       RETURNING *`,
+      [aluno_id, data_hora]
+    );
+
+    res.json({
+      message: "Aula criada e aguardando instrutor aceitar.",
+      aula: novaAula.rows[0]
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// 🔍 LISTAR AULAS
+app.get('/aulas', async (req, res) => {
+  try {
+    const aulas = await pool.query(
+      `SELECT a.*, 
+              al.nome AS aluno_nome,
+              i.nome AS instrutor_nome,
+              v.modelo AS veiculo_modelo
+       FROM habilitaplus.aulas a
+       LEFT JOIN habilitaplus.alunos al ON al.id = a.aluno_id
+       LEFT JOIN habilitaplus.instrutores i ON i.id = a.instrutor_id
+       LEFT JOIN habilitaplus.veiculos v ON v.id = a.veiculo_id
+       ORDER BY a.id DESC`
+    );
+    res.json(aulas.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// --------------------------------------
 // 🎓 ROTAS DE AULAS
 // --------------------------------------
 
