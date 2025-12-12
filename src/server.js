@@ -1,3 +1,8 @@
+app.get('/teste-rota', (req, res) => {
+  res.json({ ok: true, msg: 'rota nova funcionando' });
+});
+
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
