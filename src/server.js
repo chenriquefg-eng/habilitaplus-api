@@ -1,3 +1,11 @@
+import fs from 'fs';
+
+console.log(
+  'routes existe?',
+  fs.existsSync('/app/src/routes/index.js')
+);
+
+
 import dotenv from 'dotenv';
 dotenv.config();
 
