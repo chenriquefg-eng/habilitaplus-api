@@ -687,6 +687,44 @@ app.get('/aulas/pendentes', async (req, res) => {
   }
 });
 
+
+// --------------------------------------
+// 📋 AULAS DISPONÍVEIS PARA INSTRUTORES
+// --------------------------------------
+app.get('/aulas/disponiveis', async (req, res) => {
+  try {
+    const { autoescola_id } = req.query;
+
+    if (!autoescola_id) {
+      return res.status(400).json({ error: 'autoescola_id é obrigatório' });
+    }
+
+    const result = await pool.query(`
+      SELECT 
+        a.id AS aula_id,
+        a.data_hora,
+        a.duracao,
+        al.id AS aluno_id,
+        al.nome AS aluno,
+        al.categoria_habilitacao
+      FROM habilitaplus.aulas a
+      JOIN habilitaplus.alunos al ON al.id = a.aluno_id
+      WHERE a.status = 'pendente'
+        AND al.processo_detran_ativo = true
+        AND al.biometria_validada = true
+        AND a.id NOT IN (
+          SELECT aula_id 
+          FROM habilitaplus.aulas_aceites
+        )
+      ORDER BY a.data_hora ASC
+    `);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 // Buscar aula por ID
 app.get('/aulas/:id', async (req, res) => {
   try {
@@ -813,44 +851,6 @@ app.delete('/aulas/:id', async (req, res) => {
     ]);
 
     res.json({ message: 'Aula removida com sucesso' });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// --------------------------------------
-// 📋 AULAS DISPONÍVEIS PARA INSTRUTORES
-// --------------------------------------
-app.get('/aulas/disponiveis', async (req, res) => {
-  try {
-    const { autoescola_id } = req.query;
-
-    if (!autoescola_id) {
-      return res.status(400).json({ error: 'autoescola_id é obrigatório' });
-    }
-
-    const result = await pool.query(`
-      SELECT 
-        a.id AS aula_id,
-        a.data_hora,
-        a.duracao,
-        al.id AS aluno_id,
-        al.nome AS aluno,
-        al.categoria_habilitacao
-      FROM habilitaplus.aulas a
-      JOIN habilitaplus.alunos al ON al.id = a.aluno_id
-      WHERE a.status = 'pendente'
-        AND al.processo_detran_ativo = true
-        AND al.biometria_validada = true
-        AND a.id NOT IN (
-          SELECT aula_id 
-          FROM habilitaplus.aulas_aceites
-        )
-      ORDER BY a.data_hora ASC
-    `);
-
-    res.json(result.rows);
 
   } catch (err) {
     res.status(500).json({ error: err.message });
