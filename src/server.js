@@ -1179,6 +1179,24 @@ app.get('/relatorios/instrutor/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// 📚 LISTAR AULAS PENDENTES (VERSÃO SIMPLES)
+// --------------------------------------
+app.get('/aulas/pendentes', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT * 
+       FROM habilitaplus.aulas
+       WHERE status = 'pendente'
+       ORDER BY id`
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Erro ao buscar aulas pendentes:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ---------------------------------------
 // ENDPOINTS DE TESTE
