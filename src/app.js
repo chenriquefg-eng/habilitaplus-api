@@ -10,4 +10,6 @@ app.use(express.json());
 app.use(routes);
 
 export default app;
+import routes from './routes/index.js';
+app.use(routes);
 
