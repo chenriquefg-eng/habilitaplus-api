@@ -858,7 +858,7 @@ app.delete('/aulas/:id', async (req, res) => {
 // --------------------------------------
 // ✅ INSTRUTOR ACEITA AULA (ATÔMICO)
 // --------------------------------------
-app.post('/aulas/:id/aceitar', async (req, res) => {
+app.post('/aulas/aceitar/:id', async (req, res) => {
   const aulaId = Number(req.params.id);
   const { instrutor_id } = req.body;
 
