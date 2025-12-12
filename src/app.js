@@ -7,9 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// rotas
 app.use(routes);
 
 export default app;
-import routes from './routes/index.js';
-app.use(routes);
-
