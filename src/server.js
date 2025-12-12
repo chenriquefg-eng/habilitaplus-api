@@ -1316,14 +1316,6 @@ app.get('/db-test', async (req, res) => {
   }
 });
 
-// ---------------------------------------
-// 🚀 SUBIR SERVIDOR
-// ---------------------------------------
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 HabilitaPlus API rodando na porta ${PORT}`);
-});
 // Atualizar instrutor
 app.put('/instrutores/:id', async (req, res) => {
   try {
@@ -1512,5 +1504,13 @@ app.delete('/alunos/:id', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+// --------------------------------------- 
+// 🚀 SUBIR SERVIDOR
+// ---------------------------------------
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 HabilitaPlus API rodando na porta ${PORT}`);
 });
 
