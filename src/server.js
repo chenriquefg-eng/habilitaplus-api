@@ -686,67 +686,6 @@ app.get('/aulas/pendentes', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// --------------------------------------
-// ✅ INSTRUTOR ACEITA AULA (ATÔMICO)
-// --------------------------------------
-app.post('/aulas/:id/aceitar', async (req, res) => {
-  const aulaId = Number(req.params.id);
-  const { instrutor_id } = req.body;
-
-  if (!instrutor_id) {
-    return res.status(400).json({ error: 'instrutor_id é obrigatório' });
-  }
-
-  const client = await pool.connect();
-
-  try {
-    await client.query('BEGIN');
-
-    // trava a aula
-    const aula = await client.query(
-      `SELECT id, instrutor_id, status
-       FROM habilitaplus.aulas
-       WHERE id = $1
-       FOR UPDATE`,
-      [aulaId]
-    );
-
-    if (aula.rows.length === 0) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ error: 'Aula não encontrada' });
-    }
-
-    if (aula.rows[0].instrutor_id) {
-      await client.query('ROLLBACK');
-      return res.status(409).json({
-        error: 'Aula já foi aceita por outro instrutor'
-      });
-    }
-
-    const update = await client.query(
-      `UPDATE habilitaplus.aulas
-       SET instrutor_id = $1,
-           status = 'aceita'
-       WHERE id = $2
-       RETURNING *`,
-      [instrutor_id, aulaId]
-    );
-
-    await client.query('COMMIT');
-
-    res.json({
-      message: 'Aula aceita com sucesso',
-      aula: update.rows[0]
-    });
-
-  } catch (err) {
-    await client.query('ROLLBACK');
-    res.status(500).json({ error: err.message });
-  } finally {
-    client.release();
-  }
-});
-
 
 // --------------------------------------
 // 📋 AULAS DISPONÍVEIS PARA INSTRUTORES
@@ -916,6 +855,67 @@ app.delete('/aulas/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// --------------------------------------
+// ✅ INSTRUTOR ACEITA AULA (ATÔMICO)
+// --------------------------------------
+app.post('/aulas/:id/aceitar', async (req, res) => {
+  const aulaId = Number(req.params.id);
+  const { instrutor_id } = req.body;
+
+  if (!instrutor_id) {
+    return res.status(400).json({ error: 'instrutor_id é obrigatório' });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // trava a aula
+    const aula = await client.query(
+      `SELECT id, instrutor_id, status
+       FROM habilitaplus.aulas
+       WHERE id = $1
+       FOR UPDATE`,
+      [aulaId]
+    );
+
+    if (aula.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Aula não encontrada' });
+    }
+
+    if (aula.rows[0].instrutor_id) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({
+        error: 'Aula já foi aceita por outro instrutor'
+      });
+    }
+
+    const update = await client.query(
+      `UPDATE habilitaplus.aulas
+       SET instrutor_id = $1,
+           status = 'aceita'
+       WHERE id = $2
+       RETURNING *`,
+      [instrutor_id, aulaId]
+    );
+
+    await client.query('COMMIT');
+
+    res.json({
+      message: 'Aula aceita com sucesso',
+      aula: update.rows[0]
+    });
+
+  } catch (err) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: err.message });
+  } finally {
+    client.release();
+  }
+});
+
 
 
 // --------------------------------------
