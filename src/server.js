@@ -871,7 +871,6 @@ app.post('/aulas/:id/aceitar', async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // trava a aula
     const aula = await client.query(
       `SELECT id, instrutor_id, status
        FROM habilitaplus.aulas
@@ -915,8 +914,6 @@ app.post('/aulas/:id/aceitar', async (req, res) => {
     client.release();
   }
 });
-
-
 
 // --------------------------------------
 // 📊 RELATÓRIO: Aulas por Instrutor
