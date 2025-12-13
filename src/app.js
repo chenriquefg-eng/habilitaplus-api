@@ -1,19 +1,16 @@
 import express from 'express';
 import cors from 'cors';
+import { listarInstrutores } from './controllers/instrutores.controller.js';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// rota de teste direta (sem router)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// rota direta para testar
-app.get('/instrutores', (req, res) => {
-  res.json({ message: 'Lista de instrutores' });
-});
+app.get('/instrutores', listarInstrutores);
 
 export default app;
