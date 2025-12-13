@@ -1,3 +1,5 @@
+console.log('>> instrutores.routes.js carregado');
+
 import { Router } from 'express';
 
 const router = Router();
