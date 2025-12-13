@@ -1,9 +1,11 @@
 import express from 'express';
+import routes from './routes/index.js';
 
 const app = express();
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', app: 'HabilitaPlus API' });
-});
+app.use(express.json());
+
+// rotas
+app.use('/', routes);
 
 export default app;
