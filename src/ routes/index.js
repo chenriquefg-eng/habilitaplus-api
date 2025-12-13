@@ -1,3 +1,5 @@
+console.log('>> routes/index.js carregado');
+
 import { Router } from 'express';
 import instrutoresRoutes from './instrutores.routes.js';
 
