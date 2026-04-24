@@ -1,3 +1,4 @@
+import pool from './db/pool.js';
 import express from 'express';
 import cors from 'cors';
 
@@ -60,26 +61,7 @@ app.post('/alunos', (req, res) => {
 });
 let aulas = [];
 
-app.post('/aulas', (req, res) => {
-  const aula = {
-    id: aulas.length + 1,
-    aluno: req.body.aluno,
-    categoria: req.body.categoria,
-    data: req.body.data,
-    horario: req.body.horario,
-    valor: req.body.valor || 100, // 👈 AQUI
-    status: 'pendente'
-  };
-
-  aulas.push(aula);
-
-  res.status(201).json({
-    status: 'ok',
-    mensagem: 'Aula criada com sucesso',
-    aula
-  });
-});
-
+import pool from './db/pool.js';
 app.get('/aulas', (req, res) => {
   res.json({
     status: 'ok',
