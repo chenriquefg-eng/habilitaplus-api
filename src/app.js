@@ -50,6 +50,7 @@ app.post('/aulas', (req, res) => {
     aula
   });
 });
+
 app.get('/aulas', (req, res) => {
   res.json({
     status: 'ok',
