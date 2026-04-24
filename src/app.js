@@ -15,3 +15,9 @@ app.get('/health', (req, res) => {
 });
 
 export default app;
+app.get('/alunos', (req, res) => {
+  res.json({
+    status: 'ok',
+    mensagem: 'Rota de alunos ativa. Use POST para cadastrar.'
+  });
+});
