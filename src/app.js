@@ -99,3 +99,22 @@ app.put('/aulas/:id/aceitar', (req, res) => {
     aula
   });
 });
+app.put('/aulas/:id/concluir', (req, res) => {
+  const id = parseInt(req.params.id);
+  const aula = aulas.find(a => a.id === id);
+
+  if (!aula) {
+    return res.status(404).json({
+      status: 'erro',
+      mensagem: 'Aula não encontrada'
+    });
+  }
+
+  aula.status = 'concluida';
+
+  res.json({
+    status: 'ok',
+    mensagem: 'Aula concluída',
+    aula
+  });
+});
