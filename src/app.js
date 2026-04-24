@@ -59,6 +59,7 @@ app.post('/aulas', (req, res) => {
     categoria: req.body.categoria,
     data: req.body.data,
     horario: req.body.horario,
+    valor: req.body.valor || 100, // 👈 AQUI
     status: 'pendente'
   };
 
