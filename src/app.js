@@ -30,3 +30,23 @@ app.post('/alunos', (req, res) => {
     aluno
   });
 });
+let aulas = [];
+
+app.post('/aulas', (req, res) => {
+  const aula = {
+    id: aulas.length + 1,
+    aluno: req.body.aluno,
+    categoria: req.body.categoria,
+    data: req.body.data,
+    horario: req.body.horario,
+    status: 'pendente'
+  };
+
+  aulas.push(aula);
+
+  res.status(201).json({
+    status: 'ok',
+    mensagem: 'Aula criada com sucesso',
+    aula
+  });
+});
