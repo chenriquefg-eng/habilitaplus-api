@@ -26,6 +26,14 @@ app.put('/aulas/:id/aceitar', (req, res) => {
   }
 
   aula.status = 'aceita';
+  const valorInstrutor = aula.valor * 0.7;
+const valorApp = aula.valor * 0.3;
+
+aula.pagamento = {
+  total: aula.valor,
+  instrutor: valorInstrutor,
+  app: valorApp
+};
   aula.instrutor = req.body.instrutor || 'Não informado';
 
   res.json({
