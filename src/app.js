@@ -62,33 +62,27 @@ app.post('/alunos', (req, res) => {
 let aulas = [];
 
 import pool from './db/pool.js';
-app.get('/aulas', (req, res) => {
-  res.json({
-    status: 'ok',
-    total: aulas.length,
-    aulas
-  });
-});
-app.put('/aulas/:id/aceitar', (req, res) => {
-  const id = parseInt(req.params.id);
+app.get('/aulas', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT *
+      FROM habilitaplus.aulas
+      ORDER BY id DESC
+    `);
 
-  const aula = aulas.find(a => a.id === id);
+    res.json({
+      status: 'ok',
+      origem: 'banco_postgres',
+      total: result.rows.length,
+      aulas: result.rows
+    });
 
-  if (!aula) {
-    return res.status(404).json({
+  } catch (error) {
+    res.status(500).json({
       status: 'erro',
-      mensagem: 'Aula não encontrada'
+      mensagem: error.message
     });
   }
-
-  aula.status = 'aceita';
-  aula.instrutor = req.body.instrutor || 'Instrutor não informado';
-
-  res.json({
-    status: 'ok',
-    mensagem: 'Aula aceita com sucesso',
-    aula
-  });
 });
 app.put('/aulas/:id/concluir', (req, res) => {
   const id = parseInt(req.params.id);
