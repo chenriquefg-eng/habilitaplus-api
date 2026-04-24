@@ -21,3 +21,12 @@ app.get('/alunos', (req, res) => {
     mensagem: 'Rota de alunos ativa. Use POST para cadastrar.'
   });
 });
+app.post('/alunos', (req, res) => {
+  const aluno = req.body;
+
+  res.status(201).json({
+    status: 'ok',
+    mensagem: 'Aluno cadastrado com sucesso',
+    aluno
+  });
+});
