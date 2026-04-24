@@ -13,7 +13,27 @@ app.get('/', (req, res) => {
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', app: 'HabilitaPlus API' });
 });
+app.put('/aulas/:id/aceitar', (req, res) => {
+  const id = parseInt(req.params.id);
 
+  const aula = aulas.find(a => a.id === id);
+
+  if (!aula) {
+    return res.status(404).json({
+      status: 'erro',
+      mensagem: 'Aula não encontrada'
+    });
+  }
+
+  aula.status = 'aceita';
+  aula.instrutor = req.body.instrutor || 'Não informado';
+
+  res.json({
+    status: 'ok',
+    mensagem: 'Aula aceita com sucesso',
+    aula
+  });
+});
 export default app;
 app.get('/alunos', (req, res) => {
   res.json({
