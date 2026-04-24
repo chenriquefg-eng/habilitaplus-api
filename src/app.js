@@ -15,6 +15,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', app: 'HabilitaPlus API' });
 });
 
-app.use('/', routes);
+
 
 export default app;
