@@ -183,6 +183,7 @@ app.get('/aulas/pendentes', async (req, res) => {
       total: result.rows.length,
       aulas: result.rows
     });
+
   } catch (error) {
     res.status(500).json({
       status: 'erro',
