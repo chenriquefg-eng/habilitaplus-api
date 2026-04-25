@@ -113,6 +113,7 @@ app.put('/aulas/:id/aceitar', async (req, res) => {
     repasse_instrutor = valor * 0.70,
     repasse_app = valor * 0.30
   WHERE id = $2
+    AND status = 'pendente'
     AND valor IS NOT NULL
   RETURNING *
 `, [instrutor_id, id]);
