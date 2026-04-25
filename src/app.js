@@ -168,5 +168,26 @@ app.put('/aulas/:id/concluir', async (req, res) => {
     });
   }
 });
+app.get('/aulas/pendentes', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT *
+      FROM habilitaplus.aulas
+      WHERE status = 'pendente'
+        AND valor IS NOT NULL
+      ORDER BY data_hora ASC
+    `);
 
+    res.json({
+      status: 'ok',
+      total: result.rows.length,
+      aulas: result.rows
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
+});
 export default app;
