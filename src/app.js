@@ -191,4 +191,139 @@ app.get('/aulas/pendentes', async (req, res) => {
     });
   }
 });
+app.get('/instrutor', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel do Instrutor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f6fb;
+      margin: 0;
+      padding: 20px;
+      color: #0f172a;
+    }
+    h1 {
+      color: #0b3b75;
+      margin-bottom: 5px;
+    }
+    .sub {
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .linha {
+      margin: 6px 0;
+      font-size: 15px;
+    }
+    button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #0b7cff;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <h1>Instrutor CNH</h1>
+  <div class="sub">Aulas disponíveis para aceitar</div>
+
+  <div id="lista">Carregando aulas...</div>
+
+  <script>
+    const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
+    const INSTRUTOR_ID = 7;
+
+    async function carregarAulas() {
+      const lista = document.getElementById('lista');
+      lista.innerHTML = 'Carregando aulas...';
+
+      try {
+        const resp = await fetch(API + '/aulas/pendentes');
+        const data = await resp.json();
+
+        if (!data.aulas || data.aulas.length === 0) {
+          lista.innerHTML = '<p>Nenhuma aula disponível no momento.</p>';
+          return;
+        }
+
+        lista.innerHTML = '';
+
+        data.aulas.forEach(aula => {
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          card.innerHTML = \`
+            <div class="linha"><strong>Aula #\${aula.id}</strong></div>
+            <div class="linha">Aluno ID: \${aula.aluno_id}</div>
+            <div class="linha">Data/Hora: \${new Date(aula.data_hora).toLocaleString('pt-BR')}</div>
+            <div class="linha">Duração: \${aula.duracao} minutos</div>
+            <div class="linha">Valor: R$ \${Number(aula.valor).toFixed(2)}</div>
+            <button onclick="aceitarAula(\${aula.id}, this)">ACEITAR AULA</button>
+          \`;
+
+          lista.appendChild(card);
+        });
+
+      } catch (err) {
+        lista.innerHTML = '<p>Erro ao carregar aulas.</p>';
+      }
+    }
+
+    async function aceitarAula(id, botao) {
+      botao.disabled = true;
+      botao.innerText = 'Aceitando...';
+
+      try {
+        const resp = await fetch(API + '/aulas/' + id + '/aceitar', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            instrutor_id: INSTRUTOR_ID
+          })
+        });
+
+        const data = await resp.json();
+
+        if (data.status === 'ok') {
+          alert('Aula aceita com sucesso!');
+          carregarAulas();
+        } else {
+          alert(data.mensagem || 'Não foi possível aceitar.');
+          carregarAulas();
+        }
+
+      } catch (err) {
+        alert('Erro ao aceitar aula.');
+        carregarAulas();
+      }
+    }
+
+    carregarAulas();
+  </script>
+</body>
+</html>
+  `);
+});
 export default app;
