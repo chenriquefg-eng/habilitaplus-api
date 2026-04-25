@@ -100,15 +100,16 @@ app.put('/aulas/:id/aceitar', async (req, res) => {
     const { instrutor_id } = req.body;
 
     const result = await pool.query(`
-      UPDATE habilitaplus.aulas
-      SET 
-        status = 'aceita',
-        instrutor_id = $1,
-        repasse_instrutor = COALESCE(valor, 0) * 0.70,
-        repasse_app = COALESCE(valor, 0) * 0.30
-      WHERE id = $2
-      RETURNING *
-    `, [instrutor_id, id]);
+  UPDATE habilitaplus.aulas
+  SET 
+    status = 'aceita',
+    instrutor_id = $1,
+    repasse_instrutor = valor * 0.70,
+    repasse_app = valor * 0.30
+  WHERE id = $2
+    AND valor IS NOT NULL
+  RETURNING *
+`, [instrutor_id, id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({
