@@ -111,12 +111,12 @@ app.put('/aulas/:id/aceitar', async (req, res) => {
   RETURNING *
 `, [instrutor_id, id]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        status: 'erro',
-        mensagem: 'Aula não encontrada'
-      });
-    }
+   if (result.rows.length === 0) {
+  return res.status(400).json({
+    status: 'erro',
+    mensagem: 'Aula não encontrada ou sem valor definido'
+  });
+}
 
     res.json({
       status: 'ok',
