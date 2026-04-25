@@ -121,7 +121,7 @@ app.put('/aulas/:id/aceitar', async (req, res) => {
    if (result.rows.length === 0) {
   return res.status(400).json({
     status: 'erro',
-    mensagem: 'Aula não encontrada ou sem valor definido'
+    mensagem: 'Aula já foi aceita por outro instrutor ou está inválida'
   });
 }
 
