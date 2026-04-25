@@ -98,6 +98,12 @@ app.put('/aulas/:id/aceitar', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { instrutor_id } = req.body;
+    if (!instrutor_id) {
+  return res.status(400).json({
+    status: 'erro',
+    mensagem: 'Informe o instrutor_id para aceitar a aula'
+  });
+}
 
     const result = await pool.query(`
   UPDATE habilitaplus.aulas
