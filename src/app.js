@@ -307,7 +307,8 @@ app.get('/instrutor', (req, res) => {
   <script>
     const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
     const INSTRUTOR_ID = localStorage.getItem('instrutor_id');
-    if (!INSTRUTOR_ID) {
+
+if (!INSTRUTOR_ID) {
   window.location.href = '/login-instrutor';
 }
 
@@ -806,5 +807,52 @@ app.post('/login/instrutor', async (req, res) => {
     });
   }
 });
+app.get('/login-instrutor', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HabilitaPlus - Login Instrutor</title>
+</head>
+<body style="font-family: Arial; padding:20px; background:#f3f6fb;">
 
+  <h2>Login do Instrutor</h2>
+
+  <input id="telefone" placeholder="Digite seu telefone" style="padding:10px; width:280px;">
+  
+  <br><br>
+
+  <button onclick="login()" style="padding:12px; width:280px; background:#0b7cff; color:white; border:none; border-radius:10px;">
+    ENTRAR
+  </button>
+
+  <script>
+    async function login() {
+      const telefone = document.getElementById('telefone').value.replace(/\\D/g,'');
+
+      const resp = await fetch('/login/instrutor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telefone })
+      });
+
+      const data = await resp.json();
+
+      if (data.status === 'ok') {
+        localStorage.setItem('instrutor_id', data.instrutor.id);
+        localStorage.setItem('instrutor_nome', data.instrutor.nome);
+
+        window.location.href = '/instrutor';
+      } else {
+        alert('Instrutor não encontrado. Faça o cadastro.');
+        window.location.href = '/cadastro-instrutor';
+      }
+    }
+  </script>
+
+</body>
+</html>
+  `);
+});
 export default app;
