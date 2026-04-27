@@ -716,4 +716,95 @@ if (telefoneParam) {
 </html>
   `);
 });
+app.post('/instrutores', async (req, res) => {
+  try {
+    const {
+      nome,
+      cpf,
+      telefone,
+      email,
+      categoria_habilitacao,
+      autoescola_id
+    } = req.body;
+
+    if (!nome || !telefone) {
+      return res.status(400).json({
+        status: 'erro',
+        mensagem: 'Nome e telefone são obrigatórios'
+      });
+    }
+
+    const result = await pool.query(`
+      INSERT INTO habilitaplus.instrutores
+      (nome, cpf, telefone, email, categoria_habilitacao, ativo, autoescola_id)
+      VALUES ($1, $2, $3, $4, $5, true, $6)
+      RETURNING *
+    `, [
+      nome,
+      cpf || null,
+      telefone,
+      email || null,
+      categoria_habilitacao || 'B',
+      autoescola_id || null
+    ]);
+
+    res.status(201).json({
+      status: 'ok',
+      mensagem: 'Instrutor cadastrado com sucesso',
+      instrutor: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
+});
+app.post('/login/instrutor', async (req, res) => {
+  try {
+    const { telefone } = req.body;
+
+    if (!telefone) {
+      return res.status(400).json({
+        status: 'erro',
+        mensagem: 'Telefone é obrigatório'
+      });
+    }
+
+    const result = await pool.query(`
+      SELECT id, nome, telefone, categoria_habilitacao, ativo
+      FROM habilitaplus.instrutores
+      WHERE telefone = $1
+      LIMIT 1
+    `, [telefone]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: 'erro',
+        mensagem: 'Instrutor não encontrado. Faça o cadastro primeiro.'
+      });
+    }
+
+    if (result.rows[0].ativo === false) {
+      return res.status(403).json({
+        status: 'erro',
+        mensagem: 'Instrutor inativo. Procure a administração.'
+      });
+    }
+
+    res.json({
+      status: 'ok',
+      mensagem: 'Login do instrutor realizado com sucesso',
+      instrutor: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
+});
+
 export default app;
