@@ -224,7 +224,13 @@ app.get('/aulas/pendentes', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT *
-      FROM habilitaplus.aulas
+      SELECT 
+  a.*,
+  al.nome AS aluno_nome
+FROM habilitaplus.aulas a
+LEFT JOIN habilitaplus.alunos al 
+  ON al.id = a.aluno_id
+ORDER BY a.id DESC
       WHERE status = 'pendente'
         AND valor IS NOT NULL
       ORDER BY data_hora ASC
