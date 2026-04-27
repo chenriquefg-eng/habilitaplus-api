@@ -294,14 +294,13 @@ app.get('/instrutor', (req, res) => {
     : '';
 
   card.innerHTML = `
-    <div class="linha"><strong>Aula #${aula.id}</strong></div>
-    <div class="linha">Aluno ID: ${aula.aluno_id}</div>
-    <div class="linha">Data/Hora: ${dataFormatada}</div>
-    <div class="linha">Duração: ${aula.duracao} minutos</div>
-    <div class="linha">Valor: R$ ${Number(aula.valor).toFixed(2)}</div>
-    <button onclick="aceitarAula(${aula.id}, this)">ACEITAR AULA</button>
-  `;
-
+  <div class="linha"><strong>Aula #${aula.id}</strong></div>
+  <div class="linha">Aluno ID: ${aula.aluno_id}</div>
+  <div class="linha">Data/Hora: ${dataFormatada}</div>
+  <div class="linha">Duração: ${aula.duracao} minutos</div>
+  <div class="linha">Valor: R$ ${Number(aula.valor).toFixed(2)}</div>
+  <button onclick="aceitarAula(${aula.id}, this)">ACEITAR AULA</button>
+`;
   lista.appendChild(card);
 });
 
