@@ -426,9 +426,7 @@ app.get('/aluno', (req, res) => {
     <label>Duração em minutos</label>
     <input id="duracao" type="number" value="60" />
 
-    <input id="valor" type="hidden" value="120" />
-
-<div style="margin-top:12px; font-weight:bold;">
+    <div style="margin-top:12px; font-weight:bold;">
   Valor da aula: R$ 120,00
 </div>
 
@@ -447,7 +445,7 @@ app.get('/aluno', (req, res) => {
       const aluno_id = Number(document.getElementById('aluno_id').value);
       const data_hora = document.getElementById('data_hora').value;
       const duracao = Number(document.getElementById('duracao').value);
-      const valor = Number(document.getElementById('valor').value);
+      const valor = 120;
 
       if (!aluno_id || !data_hora || !duracao || !valor) {
         mensagem.style.color = 'red';
