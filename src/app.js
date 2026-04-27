@@ -40,18 +40,18 @@ app.post('/alunos', async (req, res) => {
     }
 
     const result = await pool.query(`
-      INSERT INTO habilitaplus.alunos
-      (nome, cpf, telefone, email, categoria_cnh, status, processo_ativo, biometria_validada, renach)
-      VALUES ($1, $2, $3, $4, $5, 'ativo', true, true, $6)
-      RETURNING *
-    `, [
-      nome,
-      cpf || null,
-      telefone,
-      email || null,
-      categoria_cnh || 'B',
-      renach || 'TESTE123'
-    ]);
+  INSERT INTO habilitaplus.alunos
+  (nome, cpf, telefone, email, categoria_cnh, status, processo_ativo, biometria_validada, renach)
+  VALUES ($1, $2, $3, $4, $5, 'ativo', true, true, $6)
+  RETURNING *
+`, [
+  nome,
+  cpf || null,
+  telefone,
+  email || null,
+  categoria_cnh || 'B',
+  renach || 'TESTE123'
+]);
 
     res.status(201).json({
       status: 'ok',
