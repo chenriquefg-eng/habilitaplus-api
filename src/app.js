@@ -284,8 +284,7 @@ app.get('/instrutor', (req, res) => {
         }
 
         lista.innerHTML = '';
-
-  data.aulas.forEach(aula => {
+data.aulas.forEach(aula => {
   const card = document.createElement('div');
   card.className = 'card';
 
@@ -297,14 +296,13 @@ app.get('/instrutor', (req, res) => {
     ? Number(aula.valor).toFixed(2)
     : '0.00';
 
-  card.innerHTML = "<div class='linha'><strong>Aula #" + aula.id + "</strong></div>" +
-                 "<div class='linha'>Aluno ID: " + aula.aluno_id + "</div>";
-    <div class="linha">Aluno ID: ${aula.aluno_id}</div>
-    <div class="linha">Data/Hora: ${dataFormatada}</div>
-    <div class="linha">Duração: ${aula.duracao} minutos</div>
-    <div class="linha">Valor: R$ ${valorFormatado}</div>
-    <button onclick="aceitarAula(${aula.id}, this)">ACEITAR AULA</button>
-  `;
+  card.innerHTML =
+    "<div class='linha'><strong>Aula #" + aula.id + "</strong></div>" +
+    "<div class='linha'>Aluno ID: " + aula.aluno_id + "</div>" +
+    "<div class='linha'>Data/Hora: " + dataFormatada + "</div>" +
+    "<div class='linha'>Duração: " + aula.duracao + " minutos</div>" +
+    "<div class='linha'>Valor: R$ " + valorFormatado + "</div>" +
+    "<button onclick='aceitarAula(" + aula.id + ", this)'>ACEITAR AULA</button>";
 
   lista.appendChild(card);
 });
