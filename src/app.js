@@ -581,11 +581,11 @@ app.get('/login', (req, res) => {
   <meta charset="UTF-8">
   <title>HabilitaPlus - Login</title>
 </head>
-<body style="font-family: Arial; padding: 20px; background:white; color:#111;">
+<body style="font-family: Arial; padding: 20px;">
 
   <h2>HabilitaPlus</h2>
 
- <input id="telefone" placeholder="Digite seu telefone" style="padding:10px; width:200px; background:white; color:#111; border:1px solid #999;" />
+  <input id="telefone" placeholder="Digite seu telefone" style="padding:10px; width:200px;" />
   
   <br><br>
 
