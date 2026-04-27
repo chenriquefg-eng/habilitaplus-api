@@ -307,6 +307,9 @@ app.get('/instrutor', (req, res) => {
   <script>
     const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
     const INSTRUTOR_ID = 7;
+    if (!INSTRUTOR_ID) {
+  window.location.href = '/login-instrutor';
+}
 
     async function carregarAulas() {
       const lista = document.getElementById('lista');
