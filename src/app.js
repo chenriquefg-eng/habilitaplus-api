@@ -298,7 +298,9 @@ app.get('/instrutor', (req, res) => {
     : '0.00';
 
   card.innerHTML = `
-    <div class="linha"><strong>Aula #${aula.id}</strong></div>
+   card.innerHTML = \\`
+  <div class="linha"><strong>Aula #\${aula.id}</strong></div>
+\\`;
     <div class="linha">Aluno ID: ${aula.aluno_id}</div>
     <div class="linha">Data/Hora: ${dataFormatada}</div>
     <div class="linha">Duração: ${aula.duracao} minutos</div>
