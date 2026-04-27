@@ -285,23 +285,25 @@ app.get('/instrutor', (req, res) => {
 
         lista.innerHTML = '';
 
-        data.aulas.forEach(aula => {
-          const card = document.createElement('div');
-          card.className = 'card';
+      data.aulas.forEach(aula => {
+  const card = document.createElement('div');
+  card.className = 'card';
 
-          card.innerHTML = \`
-            <div class="linha"><strong>Aula #\${aula.id}</strong></div>
-            <div class="linha">Aluno ID: \${aula.aluno_id}</div>
-            new Date(aula.data_hora).toLocaleString('pt-BR', {
-  timeZone: 'America/Sao_Paulo'
-})
-            <div class="linha">Duração: \${aula.duracao} minutos</div>
-            <div class="linha">Valor: R$ \${Number(aula.valor).toFixed(2)}</div>
-            <button onclick="aceitarAula(\${aula.id}, this)">ACEITAR AULA</button>
-          \`;
+  const dataFormatada = aula.data_hora
+    ? new Date(aula.data_hora.replace('Z', '')).toLocaleString('pt-BR')
+    : '';
 
-          lista.appendChild(card);
-        });
+  card.innerHTML = `
+    <div class="linha"><strong>Aula #${aula.id}</strong></div>
+    <div class="linha">Aluno ID: ${aula.aluno_id}</div>
+    <div class="linha">Data/Hora: ${dataFormatada}</div>
+    <div class="linha">Duração: ${aula.duracao} minutos</div>
+    <div class="linha">Valor: R$ ${Number(aula.valor).toFixed(2)}</div>
+    <button onclick="aceitarAula(${aula.id}, this)">ACEITAR AULA</button>
+  `;
+
+  lista.appendChild(card);
+});
 
       } catch (err) {
         lista.innerHTML = '<p>Erro ao carregar aulas.</p>';
