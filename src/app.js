@@ -855,4 +855,5 @@ app.get('/login-instrutor', (req, res) => {
 </html>
   `);
 });
+app.get('/cadastro-instrutor', (req, res) => {
 export default app;
