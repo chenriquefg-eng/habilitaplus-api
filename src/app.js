@@ -687,5 +687,4 @@ app.get('/cadastro-aluno', (req, res) => {
 </html>
   `);
 });
-  
-export default app;
+ export default app;
