@@ -50,7 +50,7 @@ app.post('/alunos', async (req, res) => {
       telefone,
       email || null,
       categoria_cnh || 'B',
-      renach || null
+      renach || 'TESTE123'
     ]);
 
     res.status(201).json({
