@@ -529,4 +529,42 @@ setTimeout(() => {
 </html>
   `);
 });
+app.post('/login/aluno', async (req, res) => {
+  try {
+    const { telefone } = req.body;
+
+    if (!telefone) {
+      return res.status(400).json({
+        status: 'erro',
+        mensagem: 'Telefone é obrigatório'
+      });
+    }
+
+    const result = await pool.query(`
+      SELECT id, nome, telefone, categoria_cnh, status
+      FROM habilitaplus.alunos
+      WHERE telefone = $1
+      LIMIT 1
+    `, [telefone]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: 'erro',
+        mensagem: 'Aluno não encontrado. Faça o cadastro primeiro.'
+      });
+    }
+
+    res.json({
+      status: 'ok',
+      mensagem: 'Login realizado com sucesso',
+      aluno: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
+});
 export default app;
