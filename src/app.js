@@ -298,7 +298,7 @@ app.get('/instrutor', (req, res) => {
   <div class="linha">Aluno ID: ${aula.aluno_id}</div>
   <div class="linha">Data/Hora: ${dataFormatada}</div>
   <div class="linha">Duração: ${aula.duracao} minutos</div>
-  <div class="linha">Valor: R$ ${Number(aula.valor).toFixed(2)}</div>
+  <div class="linha">Valor: R$ ${aula.valor ? Number(aula.valor).toFixed(2) : '0.00'}</div>
   <button onclick="aceitarAula(${aula.id}, this)">ACEITAR AULA</button>
 `;
   lista.appendChild(card);
