@@ -606,7 +606,8 @@ app.get('/login', (req, res) => {
 
         window.location.href = '/aluno';
       } else {
-        alert(data.mensagem);
+        alert('Aluno não encontrado. Vamos fazer seu cadastro.');
+window.location.href = '/cadastro-aluno';
       }
     }
   </script>
