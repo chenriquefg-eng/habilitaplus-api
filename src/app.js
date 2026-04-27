@@ -426,8 +426,11 @@ app.get('/aluno', (req, res) => {
     <label>Duração em minutos</label>
     <input id="duracao" type="number" value="60" />
 
-    <label>Valor da aula</label>
-    <input id="valor" type="number" value="120" />
+    <input id="valor" type="hidden" value="120" />
+
+<div style="margin-top:12px; font-weight:bold;">
+  Valor da aula: R$ 120,00
+</div>
 
     <button onclick="solicitarAula()">SOLICITAR AULA</button>
 
