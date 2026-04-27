@@ -22,14 +22,50 @@ app.get('/alunos', (req, res) => {
   });
 });
 
-app.post('/alunos', (req, res) => {
-  const aluno = req.body;
+app.post('/alunos', async (req, res) => {
+  try {
+    const {
+      nome,
+      cpf,
+      telefone,
+      email,
+      categoria_cnh,
+      renach
+    } = req.body;
 
-  res.status(201).json({
-    status: 'ok',
-    mensagem: 'Aluno cadastrado com sucesso',
-    aluno
-  });
+    if (!nome || !telefone) {
+      return res.status(400).json({
+        status: 'erro',
+        mensagem: 'Nome e telefone são obrigatórios'
+      });
+    }
+
+    const result = await pool.query(`
+      INSERT INTO habilitaplus.alunos
+      (nome, cpf, telefone, email, categoria_cnh, status, processo_ativo, biometria_validada, renach)
+      VALUES ($1, $2, $3, $4, $5, 'ativo', true, true, $6)
+      RETURNING *
+    `, [
+      nome,
+      cpf || null,
+      telefone,
+      email || null,
+      categoria_cnh || 'B',
+      renach || null
+    ]);
+
+    res.status(201).json({
+      status: 'ok',
+      mensagem: 'Aluno cadastrado com sucesso',
+      aluno: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
 });
 
 app.get('/aulas', async (req, res) => {
