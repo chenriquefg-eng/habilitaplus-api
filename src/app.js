@@ -634,8 +634,7 @@ app.get('/cadastro-aluno', (req, res) => {
   <input id="cpf" placeholder="CPF" style="display:block; margin:8px 0; padding:10px; width:280px;">
   <input id="email" placeholder="E-mail" style="display:block; margin:8px 0; padding:10px; width:280px;">
   <input id="categoria_cnh" placeholder="Categoria CNH" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
- <input id="renach" placeholder="RENACH (opcional)" ...>
-
+<input id="renach" placeholder="RENACH (se já tiver)" style="display:block; margin:8px 0; padding:10px; width:280px;">
   <button style="
   padding:14px;
   width:280px;
