@@ -336,7 +336,7 @@ data.aulas.forEach(aula => {
 
   card.innerHTML =
     "<div class='linha'><strong>Aula #" + aula.id + "</strong></div>" +
-    "<div class='linha'>Aluno ID: " + aula.aluno_id + "</div>" +
+    "Aluno: " + (aula.aluno_nome || 'Não informado')
     "<div class='linha'>Data/Hora: " + dataFormatada + "</div>" +
     "<div class='linha'>Duração: " + aula.duracao + " minutos</div>" +
     "<div class='linha'>Valor: R$ " + valorFormatado + "</div>" +
