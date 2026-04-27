@@ -470,7 +470,10 @@ app.get('/aluno', (req, res) => {
 
         if (data.status === 'ok') {
           mensagem.style.color = 'green';
-          mensagem.innerText = 'Aula solicitada com sucesso! Aguarde um instrutor aceitar.';
+          mensagem.innerHTML = '✅ Aula solicitada com sucesso!<br>Aguarde um instrutor aceitar.';
+setTimeout(() => {
+  window.location.href = '/instrutor';
+}, 1500);
         } else {
           mensagem.style.color = 'red';
           mensagem.innerText = data.mensagem || 'Erro ao solicitar aula.';
