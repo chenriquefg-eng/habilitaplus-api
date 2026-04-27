@@ -248,6 +248,8 @@ app.get('/aulas/pendentes', async (req, res) => {
     });
   }
 });
+  }
+});
 app.get('/instrutor', (req, res) => {
   res.send(`
 <!DOCTYPE html>
