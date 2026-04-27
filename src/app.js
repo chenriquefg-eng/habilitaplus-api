@@ -615,4 +615,77 @@ app.get('/login', (req, res) => {
 </html>
   `);
 });
+app.get('/cadastro-aluno', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>HabilitaPlus - Cadastro</title>
+</head>
+<body style="font-family: Arial; padding:20px; background:#f3f6fb; color:#111;">
+
+  <h2>HabilitaPlus</h2>
+  <p>Cadastro do aluno</p>
+
+  <input id="nome" placeholder="Nome completo" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="telefone" placeholder="Telefone" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="cpf" placeholder="CPF" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="email" placeholder="E-mail" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="categoria_cnh" placeholder="Categoria CNH" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="renach" placeholder="RENACH" style="display:block; margin:8px 0; padding:10px; width:280px;">
+
+  <button onclick="cadastrar()" style="padding:12px; margin-top:10px;">CADASTRAR</button>
+
+  <p id="mensagem"></p>
+
+  <script>
+    async function cadastrar() {
+      const mensagem = document.getElementById('mensagem');
+
+      const dados = {
+        nome: document.getElementById('nome').value,
+        telefone: document.getElementById('telefone').value,
+        cpf: document.getElementById('cpf').value,
+        email: document.getElementById('email').value,
+        categoria_cnh: document.getElementById('categoria_cnh').value,
+        renach: document.getElementById('renach').value
+      };
+
+      if (!dados.nome || !dados.telefone) {
+        mensagem.style.color = 'red';
+        mensagem.innerText = 'Nome e telefone são obrigatórios.';
+        return;
+      }
+
+      const resp = await fetch('/alunos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+
+      const data = await resp.json();
+
+      if (data.status === 'ok') {
+        localStorage.setItem('aluno_id', data.aluno.id);
+        localStorage.setItem('aluno_nome', data.aluno.nome);
+
+        mensagem.style.color = 'green';
+        mensagem.innerText = 'Cadastro realizado com sucesso!';
+
+        setTimeout(() => {
+          window.location.href = '/aluno';
+        }, 1000);
+      } else {
+        mensagem.style.color = 'red';
+        mensagem.innerText = data.mensagem || 'Erro ao cadastrar.';
+      }
+    }
+  </script>
+
+</body>
+</html>
+  `);
+});
+  
 export default app;
