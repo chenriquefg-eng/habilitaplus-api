@@ -579,7 +579,7 @@ app.post('/login/aluno', async (req, res) => {
 app.get('/login', (req, res) => {
   res.send(`
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>HabilitaPlus - Login</title>
@@ -588,28 +588,7 @@ app.get('/login', (req, res) => {
 
   <h2>HabilitaPlus</h2>
 
-  <input id="telefone" placeholder="Digite seu telefone" />
-<button onclick="login()">ENTRAR</button>
-async function login() {
-  const telefone = document.getElementById('telefone').value;
-
-  const resp = await fetch('/login/aluno', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ telefone })
-  });
-
-  const data = await resp.json();
-
-  if (data.status === 'ok') {
-    localStorage.setItem('aluno_id', data.aluno.id);
-    localStorage.setItem('aluno_nome', data.aluno.nome);
-
-    window.location.href = '/aluno';
-  } else {
-    alert(data.mensagem);
-  }
-}
+  <input id="telefone" placeholder="Digite seu telefone" style="padding:10px; width:200px;" />
   
   <br><br>
 
@@ -622,7 +601,7 @@ async function login() {
       const resp = await fetch('/login/aluno', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ telefone })
+        body: JSON.stringify({ telefone: telefone })
       });
 
       const data = await resp.json();
