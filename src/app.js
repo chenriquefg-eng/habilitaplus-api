@@ -348,4 +348,142 @@ data.aulas.forEach(aula => {
 </html>
   `);
 });
+app.get('/aluno', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HabilitaPlus - Aluno</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f6fb;
+      margin: 0;
+      padding: 20px;
+      color: #0f172a;
+    }
+    h1 {
+      color: #0b3b75;
+      margin-bottom: 5px;
+    }
+    .sub {
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #0b7cff;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .msg {
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>HabilitaPlus</h1>
+  <div class="sub">Solicitação de aula prática</div>
+
+  <div class="card">
+    <label>Aluno ID</label>
+    <input id="aluno_id" type="number" value="1" />
+
+    <label>Data e hora da aula</label>
+    <input id="data_hora" type="datetime-local" />
+
+    <label>Duração em minutos</label>
+    <input id="duracao" type="number" value="60" />
+
+    <label>Valor da aula</label>
+    <input id="valor" type="number" value="120" />
+
+    <button onclick="solicitarAula()">SOLICITAR AULA</button>
+
+    <div id="mensagem" class="msg"></div>
+  </div>
+
+  <script>
+    const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
+
+    async function solicitarAula() {
+      const mensagem = document.getElementById('mensagem');
+      mensagem.innerText = 'Enviando solicitação...';
+
+      const aluno_id = Number(document.getElementById('aluno_id').value);
+      const data_hora = document.getElementById('data_hora').value;
+      const duracao = Number(document.getElementById('duracao').value);
+      const valor = Number(document.getElementById('valor').value);
+
+      if (!aluno_id || !data_hora || !duracao || !valor) {
+        mensagem.style.color = 'red';
+        mensagem.innerText = 'Preencha todos os campos.';
+        return;
+      }
+
+      try {
+        const resp = await fetch(API + '/aulas', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            aluno_id: aluno_id,
+            data_hora: data_hora,
+            duracao: duracao,
+            valor: valor
+          })
+        });
+
+        const data = await resp.json();
+
+        if (data.status === 'ok') {
+          mensagem.style.color = 'green';
+          mensagem.innerText = 'Aula solicitada com sucesso! Aguarde um instrutor aceitar.';
+        } else {
+          mensagem.style.color = 'red';
+          mensagem.innerText = data.mensagem || 'Erro ao solicitar aula.';
+        }
+
+      } catch (err) {
+        mensagem.style.color = 'red';
+        mensagem.innerText = 'Erro de conexão com a API.';
+      }
+    }
+  </script>
+</body>
+</html>
+  `);
+});
 export default app;
