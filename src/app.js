@@ -636,8 +636,17 @@ app.get('/cadastro-aluno', (req, res) => {
   <input id="categoria_cnh" placeholder="Categoria CNH" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
   <input id="renach" placeholder="RENACH" style="display:block; margin:8px 0; padding:10px; width:280px;">
 
-  <button onclick="cadastrar()" style="padding:12px; margin-top:10px;">CADASTRAR</button>
-
+  <button style="
+  padding:14px;
+  width:280px;
+  background:#0b7cff;
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+">
+  CADASTRAR
+</button>
   <p id="mensagem"></p>
 
   <script>
