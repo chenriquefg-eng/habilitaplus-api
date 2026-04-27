@@ -306,7 +306,7 @@ app.get('/instrutor', (req, res) => {
 
   <script>
     const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
-    const INSTRUTOR_ID = 7;
+    const INSTRUTOR_ID = localStorage.getItem('instrutor_id');
     if (!INSTRUTOR_ID) {
   window.location.href = '/login-instrutor';
 }
