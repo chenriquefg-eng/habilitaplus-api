@@ -244,7 +244,8 @@ app.get('/instrutor', (req, res) => {
   </style>
 </head>
 <body>
-  <h1>Instrutor CNH</h1>
+  <h1>HabilitaPlus</h1>
+<div class="sub">Painel do instrutor • Aulas disponíveis</div>
   <div class="sub">Aulas disponíveis para aceitar</div>
 
   <div id="lista">Carregando aulas...</div>
