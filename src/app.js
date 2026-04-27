@@ -21,9 +21,6 @@ app.get('/alunos', (req, res) => {
     mensagem: 'Rota de alunos ativa. Use POST para cadastrar.'
   });
 });
-app.get('/login', (req, res) => {
-  res.send(`...`);
-});
 app.post('/alunos', async (req, res) => {
   try {
     const {
