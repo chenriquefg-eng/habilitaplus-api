@@ -855,5 +855,79 @@ app.get('/login-instrutor', (req, res) => {
 </html>
   `);
 });
+app.get('/cadastro-instrutor', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>HabilitaPlus - Cadastro Instrutor</title>
+</head>
+<body style="font-family: Arial; padding:20px; background:#f3f6fb;">
 
+  <h2>Cadastro de Instrutor</h2>
+
+  <input id="nome" placeholder="Nome completo" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="telefone" placeholder="Telefone" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="cpf" placeholder="CPF" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="email" placeholder="E-mail" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="categoria_habilitacao" placeholder="Categoria (A, B...)" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
+
+  <button onclick="cadastrar()" style="padding:14px; width:280px; background:#0b7cff; color:white; border:none; border-radius:10px;">
+    CADASTRAR
+  </button>
+
+  <p id="mensagem"></p>
+
+  <script>
+    async function cadastrar() {
+      const mensagem = document.getElementById('mensagem');
+
+      const dados = {
+        nome: document.getElementById('nome').value,
+        telefone: document.getElementById('telefone').value,
+        cpf: document.getElementById('cpf').value,
+        email: document.getElementById('email').value,
+        categoria_habilitacao: document.getElementById('categoria_habilitacao').value
+      };
+
+      // limpa telefone
+      dados.telefone = dados.telefone.replace(/\\D/g, '');
+
+      if (!dados.nome || !dados.telefone) {
+        mensagem.style.color = 'red';
+        mensagem.innerText = 'Nome e telefone são obrigatórios';
+        return;
+      }
+
+      const resp = await fetch('/instrutores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+
+      const data = await resp.json();
+
+      if (data.status === 'ok') {
+        localStorage.setItem('instrutor_id', data.instrutor.id);
+        localStorage.setItem('instrutor_nome', data.instrutor.nome);
+
+        mensagem.style.color = 'green';
+        mensagem.innerText = 'Cadastro realizado!';
+
+        setTimeout(() => {
+          window.location.href = '/instrutor';
+        }, 1000);
+
+      } else {
+        mensagem.style.color = 'red';
+        mensagem.innerText = data.mensagem || 'Erro ao cadastrar';
+      }
+    }
+  </script>
+
+</body>
+</html>
+  `);
+});
 export default app;
