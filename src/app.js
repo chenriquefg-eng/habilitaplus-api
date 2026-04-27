@@ -479,6 +479,9 @@ app.get('/aluno', (req, res) => {
   <script>
     const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
 
+   if (!aluno_id) {
+  window.location.href = '/login';
+}
     async function solicitarAula() {
       const mensagem = document.getElementById('mensagem');
       mensagem.innerText = 'Enviando solicitação...';
