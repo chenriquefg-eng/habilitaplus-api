@@ -20,7 +20,7 @@ app.get('/alunos', (req, res) => {
     status: 'ok',
     mensagem: 'Rota de alunos ativa. Use POST para cadastrar.'
   });
-
+});
 app.post('/alunos', async (req, res) => {
   try {
     const {
@@ -688,4 +688,4 @@ app.get('/cadastro-aluno', (req, res) => {
 </html>
   `);
 });
- export default app;
+export default app;
