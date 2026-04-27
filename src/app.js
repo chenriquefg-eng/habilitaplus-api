@@ -418,6 +418,10 @@ app.get('/aluno', (req, res) => {
 
   <div class="card">
 
+  <div style="margin-bottom:12px; font-weight:bold;">
+    Aluno: Henrique
+  </div>
+
   <label>Data e hora da aula</label>
   <input id="data_hora" type="datetime-local" />
 
@@ -430,12 +434,10 @@ app.get('/aluno', (req, res) => {
     Valor da aula: R$ 120,00
   </div>
 
+  <button onclick="solicitarAula()">SOLICITAR AULA</button>
+
+  <div id="mensagem" class="msg"></div>
 </div>
-    <button onclick="solicitarAula()">SOLICITAR AULA</button>
-
-    <div id="mensagem" class="msg"></div>
-  </div>
-
   <script>
     const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
 
