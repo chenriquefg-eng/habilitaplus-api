@@ -292,7 +292,9 @@ app.get('/instrutor', (req, res) => {
           card.innerHTML = \`
             <div class="linha"><strong>Aula #\${aula.id}</strong></div>
             <div class="linha">Aluno ID: \${aula.aluno_id}</div>
-            <div class="linha">Data/Hora: \${new Date(aula.data_hora).toLocaleString('pt-BR')}</div>
+            new Date(aula.data_hora).toLocaleString('pt-BR', {
+  timeZone: 'America/Sao_Paulo'
+})
             <div class="linha">Duração: \${aula.duracao} minutos</div>
             <div class="linha">Valor: R$ \${Number(aula.valor).toFixed(2)}</div>
             <button onclick="aceitarAula(\${aula.id}, this)">ACEITAR AULA</button>
