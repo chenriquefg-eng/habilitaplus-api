@@ -654,13 +654,16 @@ app.get('/cadastro-aluno', (req, res) => {
       const mensagem = document.getElementById('mensagem');
 
       const dados = {
-        nome: document.getElementById('nome').value,
-        telefone: document.getElementById('telefone').value,
-        cpf: document.getElementById('cpf').value,
-        email: document.getElementById('email').value,
-        categoria_cnh: document.getElementById('categoria_cnh').value,
-        renach: document.getElementById('renach').value
-      };
+  nome: document.getElementById('nome').value,
+  telefone: document.getElementById('telefone').value,
+  cpf: document.getElementById('cpf').value,
+  email: document.getElementById('email').value,
+  categoria_cnh: document.getElementById('categoria_cnh').value,
+  renach: document.getElementById('renach').value
+};
+
+// 🔥 LIMPA O TELEFONE AQUI
+dados.telefone = dados.telefone.replace(/\D/g, '');
       if (dados.telefone.length < 10) {
   mensagem.style.color = 'red';
   mensagem.innerText = 'Telefone inválido';
