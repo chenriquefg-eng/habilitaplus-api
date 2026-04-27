@@ -680,6 +680,12 @@ app.get('/cadastro-aluno', (req, res) => {
       } else {
         mensagem.style.color = 'red';
         mensagem.innerText = data.mensagem || 'Erro ao cadastrar.';
+        const params = new URLSearchParams(window.location.search);
+const telefoneParam = params.get('telefone');
+
+if (telefoneParam) {
+  document.getElementById('telefone').value = telefoneParam;
+}
       }
     }
   </script>
