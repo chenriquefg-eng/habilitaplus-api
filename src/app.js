@@ -21,7 +21,9 @@ app.get('/alunos', (req, res) => {
     mensagem: 'Rota de alunos ativa. Use POST para cadastrar.'
   });
 });
-
+app.get('/login', (req, res) => {
+  res.send(`...`);
+});
 app.post('/alunos', async (req, res) => {
   try {
     const {
@@ -572,5 +574,71 @@ app.post('/login/aluno', async (req, res) => {
       mensagem: error.message
     });
   }
+});
+app.get('/login', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>HabilitaPlus - Login</title>
+</head>
+<body style="font-family: Arial; padding: 20px;">
+
+  <h2>HabilitaPlus</h2>
+
+  <input id="telefone" placeholder="Digite seu telefone" />
+<button onclick="login()">ENTRAR</button>
+async function login() {
+  const telefone = document.getElementById('telefone').value;
+
+  const resp = await fetch('/login/aluno', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ telefone })
+  });
+
+  const data = await resp.json();
+
+  if (data.status === 'ok') {
+    localStorage.setItem('aluno_id', data.aluno.id);
+    localStorage.setItem('aluno_nome', data.aluno.nome);
+
+    window.location.href = '/aluno';
+  } else {
+    alert(data.mensagem);
+  }
+}
+  
+  <br><br>
+
+  <button onclick="login()" style="padding:10px;">ENTRAR</button>
+
+  <script>
+    async function login() {
+      const telefone = document.getElementById('telefone').value;
+
+      const resp = await fetch('/login/aluno', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telefone })
+      });
+
+      const data = await resp.json();
+
+      if (data.status === 'ok') {
+        localStorage.setItem('aluno_id', data.aluno.id);
+        localStorage.setItem('aluno_nome', data.aluno.nome);
+
+        window.location.href = '/aluno';
+      } else {
+        alert(data.mensagem);
+      }
+    }
+  </script>
+
+</body>
+</html>
+  `);
 });
 export default app;
