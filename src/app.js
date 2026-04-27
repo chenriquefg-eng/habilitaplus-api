@@ -247,6 +247,10 @@ app.get('/aulas/pendentes', async (req, res) => {
       mensagem: error.message
     });
   }
+    });
+  }
+  });
+  }
 app.get('/instrutor', (req, res) => {
   res.send(`
 <!DOCTYPE html>
