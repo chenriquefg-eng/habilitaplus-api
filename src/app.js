@@ -661,6 +661,11 @@ app.get('/cadastro-aluno', (req, res) => {
         categoria_cnh: document.getElementById('categoria_cnh').value,
         renach: document.getElementById('renach').value
       };
+      if (dados.telefone.length < 10) {
+  mensagem.style.color = 'red';
+  mensagem.innerText = 'Telefone inválido';
+  return;
+}
 
       if (!dados.nome || !dados.telefone) {
         mensagem.style.color = 'red';
