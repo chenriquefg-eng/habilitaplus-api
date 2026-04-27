@@ -65,7 +65,23 @@ app.post('/aulas', async (req, res) => {
       duracao,
       valor
     } = req.body;
+const dataAula = new Date(data_hora);
+const agora = new Date();
+const limiteMinimo = new Date(agora.getTime() + 30 * 60000);
 
+if (isNaN(dataAula.getTime())) {
+  return res.status(400).json({
+    status: 'erro',
+    mensagem: 'Data e hora da aula inválidas'
+  });
+}
+
+if (dataAula < limiteMinimo) {
+  return res.status(400).json({
+    status: 'erro',
+    mensagem: 'A aula precisa ser agendada com pelo menos 30 minutos de antecedência'
+  });
+}
     const result = await pool.query(`
       INSERT INTO habilitaplus.aulas
       (aluno_id, instrutor_id, veiculo_id, pacote_id, data_hora, duracao, valor, status)
