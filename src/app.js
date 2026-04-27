@@ -417,19 +417,20 @@ app.get('/aluno', (req, res) => {
   <div class="sub">Solicitação de aula prática</div>
 
   <div class="card">
-    <label>Aluno ID</label>
-    <input id="aluno_id" type="number" value="1" />
 
-    <label>Data e hora da aula</label>
-    <input id="data_hora" type="datetime-local" />
+  <label>Data e hora da aula</label>
+  <input id="data_hora" type="datetime-local" />
 
-    <label>Duração em minutos</label>
-    <input id="duracao" type="number" value="60" />
+  <label>Duração</label>
+  <div style="margin-top:12px; font-weight:bold;">
+    60 minutos
+  </div>
 
-    <div style="margin-top:12px; font-weight:bold;">
-  Valor da aula: R$ 120,00
+  <div style="margin-top:12px; font-weight:bold;">
+    Valor da aula: R$ 120,00
+  </div>
+
 </div>
-
     <button onclick="solicitarAula()">SOLICITAR AULA</button>
 
     <div id="mensagem" class="msg"></div>
@@ -442,9 +443,9 @@ app.get('/aluno', (req, res) => {
       const mensagem = document.getElementById('mensagem');
       mensagem.innerText = 'Enviando solicitação...';
 
-      const aluno_id = Number(document.getElementById('aluno_id').value);
+      const aluno_id = 1;   // depois vem do login
       const data_hora = document.getElementById('data_hora').value;
-      const duracao = Number(document.getElementById('duracao').value);
+      const duracao = 60;
       const valor = 120;
 
       if (!aluno_id || !data_hora || !duracao || !valor) {
