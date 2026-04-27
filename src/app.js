@@ -489,7 +489,8 @@ app.get('/aluno', (req, res) => {
       const mensagem = document.getElementById('mensagem');
       mensagem.innerText = 'Enviando solicitação...';
 
-      const aluno_id = 1;   // depois vem do login
+      const aluno_id = localStorage.getItem('aluno_id');
+const aluno_nome = localStorage.getItem('aluno_nome');
       const data_hora = document.getElementById('data_hora').value;
       const duracao = 60;
       const valor = 120;
