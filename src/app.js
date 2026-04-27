@@ -604,7 +604,7 @@ app.get('/login', (req, res) => {
         localStorage.setItem('aluno_id', data.aluno.id);
         localStorage.setItem('aluno_nome', data.aluno.nome);
 
-        window.location.href = '/aluno';
+        window.location.href = '/cadastro-aluno?telefone=' + telefone;
       } else {
         alert('Aluno não encontrado. Vamos fazer seu cadastro.');
 window.location.href = '/cadastro-aluno';
