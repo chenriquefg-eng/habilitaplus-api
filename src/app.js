@@ -1085,4 +1085,77 @@ carregar();
 </html>
   `);
 });
+app.get('/historico-instrutor', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HabilitaPlus - Histórico Instrutor</title>
+</head>
+<body style="font-family: Arial; padding:20px; background:#f3f6fb; color:#111;">
+
+<h2>Minhas Aulas como Instrutor</h2>
+
+<div id="lista">Carregando...</div>
+
+<script>
+const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
+const instrutor_id = localStorage.getItem('instrutor_id');
+
+if (!instrutor_id) {
+  window.location.href = '/login-instrutor';
+}
+
+async function carregar() {
+  const lista = document.getElementById('lista');
+
+  try {
+    const resp = await fetch(API + '/aulas/instrutor/' + instrutor_id);
+    const data = await resp.json();
+
+    if (!data.aulas || data.aulas.length === 0) {
+      lista.innerHTML = '<p>Nenhuma aula encontrada.</p>';
+      return;
+    }
+
+    lista.innerHTML = '';
+
+    data.aulas.forEach(aula => {
+      const div = document.createElement('div');
+      div.style.background = 'white';
+      div.style.padding = '14px';
+      div.style.marginBottom = '10px';
+      div.style.borderRadius = '12px';
+      div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+
+      const dataFormatada = aula.data_hora
+        ? new Date(aula.data_hora.replace('Z', '')).toLocaleString('pt-BR')
+        : '';
+
+      const valor = aula.valor ? Number(aula.valor).toFixed(2) : '0.00';
+      const ganho = aula.repasse_instrutor ? Number(aula.repasse_instrutor).toFixed(2) : '0.00';
+
+      div.innerHTML =
+        '<strong>' + dataFormatada + '</strong><br>' +
+        'Aluno: ' + (aula.aluno_nome || 'Não informado') + '<br>' +
+        'Status: ' + aula.status + '<br>' +
+        'Valor da aula: R$ ' + valor + '<br>' +
+        'Meu ganho: R$ ' + ganho;
+
+      lista.appendChild(div);
+    });
+
+  } catch (err) {
+    lista.innerHTML = '<p>Erro ao carregar histórico.</p>';
+  }
+}
+
+carregar();
+</script>
+
+</body>
+</html>
+  `);
+});
 export default app;
