@@ -324,7 +324,7 @@ if (!INSTRUTOR_ID) {
           lista.innerHTML = '<p>Nenhuma aula disponível no momento.</p>';
           return;
         }
-
+        
         lista.innerHTML = '';
 data.aulas.forEach(aula => {
   const card = document.createElement('div');
@@ -344,14 +344,17 @@ data.aulas.forEach(aula => {
   "<div class='linha'>Data/Hora: " + dataFormatada + "</div>" +
   "<div class='linha'>Duração: " + aula.duracao + " minutos</div>" +
   "<div class='linha'>Valor: R$ " + valorFormatado + "</div>" +
-  "<button onclick='aceitarAula(" + aula.id + ", this)'>ACEITAR AULA</button>";
+  "<button onclick='aceitarAula(" + aula.id + ", this)'>ACEITAR AULA</button>" +
+  "<button onclick='verHistorico()' style='margin-top:6px; background:#64748b; color:white;'>VER HISTÓRICO</button>";
   lista.appendChild(card);
 });
       } catch (err) {
         lista.innerHTML = '<p>Erro ao carregar aulas.</p>';
       }
     }
-
+function verHistorico() {
+  window.location.href = '/historico-instrutor';
+}
     async function aceitarAula(id, botao) {
       botao.disabled = true;
       botao.innerText = 'Aceitando...';
