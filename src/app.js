@@ -929,4 +929,35 @@ app.get('/cadastro-instrutor', (req, res) => {
 </html>
   `);
 });
+app.put('/instrutores/:id/aprovar', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    const result = await pool.query(`
+      UPDATE habilitaplus.instrutores
+      SET ativo = true
+      WHERE id = $1
+      RETURNING *
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: 'erro',
+        mensagem: 'Instrutor não encontrado'
+      });
+    }
+
+    res.json({
+      status: 'ok',
+      mensagem: 'Instrutor aprovado com sucesso',
+      instrutor: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
+});
 export default app;
