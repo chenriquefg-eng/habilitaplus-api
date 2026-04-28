@@ -477,7 +477,11 @@ app.get('/aluno', (req, res) => {
 
   <button onclick="solicitarAula()">SOLICITAR AULA</button>
 
-  <div id="mensagem" class="msg"></div>
+<button onclick="verHistorico()" style="margin-top:10px; background:#64748b; color:white;">
+  VER HISTÓRICO
+</button>
+
+<div id="mensagem" class="msg"></div>
 </div>
   <script>
     const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
@@ -485,11 +489,14 @@ app.get('/aluno', (req, res) => {
    if (!aluno_id) {
   window.location.href = '/login';
 }
+    function verHistorico() {
+  window.location.href = '/historico-aluno';
+}
     async function solicitarAula() {
       const mensagem = document.getElementById('mensagem');
       mensagem.innerText = 'Enviando solicitação...';
 
-      const aluno_id = localStorage.getItem('aluno_id');
+            const aluno_id = localStorage.getItem('aluno_id');
 const aluno_nome = localStorage.getItem('aluno_nome');
       const data_hora = document.getElementById('data_hora').value;
       const duracao = 60;
@@ -959,5 +966,120 @@ app.put('/instrutores/:id/aprovar', async (req, res) => {
       mensagem: error.message
     });
   }
+});
+app.get('/aulas/aluno/:aluno_id', async (req, res) => {
+  try {
+    const aluno_id = parseInt(req.params.aluno_id);
+
+    const result = await pool.query(`
+      SELECT 
+        a.*,
+        i.nome AS instrutor_nome
+      FROM habilitaplus.aulas a
+      LEFT JOIN habilitaplus.instrutores i 
+        ON i.id = a.instrutor_id
+      WHERE a.aluno_id = $1
+      ORDER BY a.data_hora DESC
+    `, [aluno_id]);
+
+    res.json({
+      status: 'ok',
+      total: result.rows.length,
+      aulas: result.rows
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
+});
+app.get('/aulas/instrutor/:instrutor_id', async (req, res) => {
+  try {
+    const instrutor_id = parseInt(req.params.instrutor_id);
+
+    const result = await pool.query(`
+      SELECT 
+        a.*,
+        al.nome AS aluno_nome
+      FROM habilitaplus.aulas a
+      LEFT JOIN habilitaplus.alunos al 
+        ON al.id = a.aluno_id
+      WHERE a.instrutor_id = $1
+      ORDER BY a.data_hora DESC
+    `, [instrutor_id]);
+
+    res.json({
+      status: 'ok',
+      total: result.rows.length,
+      aulas: result.rows
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
+});
+app.get('/historico-aluno', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Histórico</title>
+</head>
+<body style="font-family: Arial; padding:20px;">
+
+<h2>Minhas Aulas</h2>
+
+<div id="lista">Carregando...</div>
+
+<script>
+const API = '${"https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host"}';
+const aluno_id = localStorage.getItem('aluno_id');
+
+if (!aluno_id) {
+  window.location.href = '/login';
+}
+
+async function carregar() {
+  const resp = await fetch(API + '/aulas/aluno/' + aluno_id);
+  const data = await resp.json();
+
+  const lista = document.getElementById('lista');
+
+  if (!data.aulas.length) {
+    lista.innerHTML = 'Nenhuma aula encontrada';
+    return;
+  }
+
+  lista.innerHTML = '';
+
+  data.aulas.forEach(aula => {
+    const div = document.createElement('div');
+    div.style.marginBottom = '10px';
+
+    const dataFormatada = aula.data_hora
+      ? new Date(aula.data_hora).toLocaleString('pt-BR')
+      : '';
+
+    div.innerHTML =
+      "<strong>" + dataFormatada + "</strong><br>" +
+      "Instrutor: " + (aula.instrutor_nome || 'Aguardando') + "<br>" +
+      "Status: " + aula.status;
+
+    lista.appendChild(div);
+  });
+}
+
+carregar();
+</script>
+
+</body>
+</html>
+  `);
 });
 export default app;
