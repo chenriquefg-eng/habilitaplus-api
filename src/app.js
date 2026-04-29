@@ -52,7 +52,6 @@ app.post('/alunos', async (req, res) => {
   categoria_cnh || 'B',
   renach || 'TESTE123'
 ]);
-
     res.status(201).json({
       status: 'ok',
       mensagem: 'Aluno cadastrado com sucesso',
