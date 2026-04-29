@@ -690,60 +690,59 @@ app.get('/cadastro-aluno', (req, res) => {
   <p id="mensagem"></p>
 
   <script>
-    async function cadastrar() {
-      const mensagem = document.getElementById('mensagem');
+   async function cadastrar() {
+  const mensagem = document.getElementById('mensagem');
 
-      const dados = {
-  nome: document.getElementById('nome').value,
-  telefone: document.getElementById('telefone').value,
-  cpf: document.getElementById('cpf').value,
-  email: document.getElementById('email').value,
-  categoria_cnh: document.getElementById('categoria_cnh').value,
-  renach: document.getElementById('renach').value
-};
+  const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
 
-// 🔥 LIMPA O TELEFONE AQUI
-dados.telefone = dados.telefone.replace(/\D/g, '');
-      if (dados.telefone.length < 10) {
-  mensagem.style.color = 'red';
-  mensagem.innerText = 'Telefone inválido';
-  return;
+  const dados = {
+    nome: document.getElementById('nome').value,
+    telefone: document.getElementById('telefone').value,
+    cpf: document.getElementById('cpf').value,
+    email: document.getElementById('email').value,
+    categoria_cnh: document.getElementById('categoria_cnh').value,
+    renach: document.getElementById('renach').value
+  };
+
+  // limpa telefone
+  dados.telefone = dados.telefone.replace(/\D/g, '');
+
+  if (!dados.nome || !dados.telefone) {
+    mensagem.style.color = 'red';
+    mensagem.innerText = 'Nome e telefone são obrigatórios';
+    return;
+  }
+
+  try {
+    const resp = await fetch(API + '/alunos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados)
+    });
+
+    const data = await resp.json();
+
+    if (data.status === 'ok') {
+      localStorage.setItem('aluno_id', data.aluno.id);
+      localStorage.setItem('aluno_nome', data.aluno.nome);
+
+      mensagem.style.color = 'green';
+      mensagem.innerText = 'Cadastro realizado!';
+
+      setTimeout(() => {
+        window.location.href = '/aluno';
+      }, 1000);
+
+    } else {
+      mensagem.style.color = 'red';
+      mensagem.innerText = data.mensagem || 'Erro ao cadastrar';
+    }
+
+  } catch (err) {
+    mensagem.style.color = 'red';
+    mensagem.innerText = 'Erro de conexão com servidor';
+  }
 }
-
-      if (!dados.nome || !dados.telefone) {
-        mensagem.style.color = 'red';
-        mensagem.innerText = 'Nome e telefone são obrigatórios.';
-        return;
-      }
-
-      const resp = await fetch('/alunos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados)
-      });
-
-      const data = await resp.json();
-
-      if (data.status === 'ok') {
-        localStorage.setItem('aluno_id', data.aluno.id);
-        localStorage.setItem('aluno_nome', data.aluno.nome);
-
-        mensagem.style.color = 'green';
-        mensagem.innerText = 'Cadastro realizado com sucesso!';
-
-        setTimeout(() => {
-          window.location.href = '/aluno';
-        }, 1000);
-      } else {
-        mensagem.style.color = 'red';
-        mensagem.innerText = data.mensagem || 'Erro ao cadastrar.';
-        const params = new URLSearchParams(window.location.search);
-const telefoneParam = params.get('telefone');
-
-if (telefoneParam) {
-  document.getElementById('telefone').value = telefoneParam;
-}
-      }
     }
   </script>
 
