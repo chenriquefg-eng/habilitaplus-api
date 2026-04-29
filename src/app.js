@@ -762,7 +762,7 @@ app.post('/instrutores', async (req, res) => {
 
     const result = await pool.query(`
       INSERT INTO habilitaplus.instrutores
-      (nome, cpf, telefone, email, categoria_habilitacao, ativo, autoescola_id)
+      (nome, cpf, telefone, email, categoria_cnh, ativo, autoescola_id)
       VALUES ($1, $2, $3, $4, $5, true, $6)
       RETURNING *
     `, [
@@ -770,7 +770,7 @@ app.post('/instrutores', async (req, res) => {
       cpf || null,
       telefone,
       email || null,
-      categoria_habilitacao || 'B',
+      categoria_cnh || 'B',
       autoescola_id || null
     ]);
 
@@ -799,7 +799,7 @@ app.post('/login/instrutor', async (req, res) => {
     }
 
     const result = await pool.query(`
-      SELECT id, nome, telefone, categoria_habilitacao, ativo
+      SELECT id, nome, telefone, categoria_cnh, ativo
       FROM habilitaplus.instrutores
       WHERE telefone = $1
       LIMIT 1
@@ -896,7 +896,7 @@ app.get('/cadastro-instrutor', (req, res) => {
   <input id="telefone" placeholder="Telefone" style="display:block; margin:8px 0; padding:10px; width:280px;">
   <input id="cpf" placeholder="CPF" style="display:block; margin:8px 0; padding:10px; width:280px;">
   <input id="email" placeholder="E-mail" style="display:block; margin:8px 0; padding:10px; width:280px;">
-  <input id="categoria_habilitacao" placeholder="Categoria (A, B...)" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="categoria_cnh" placeholder="Categoria (A, B...)" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
 
   <button id="btnCadastrar" type="button" style="padding:14px; width:280px; background:#0b7cff; color:white; border:none; border-radius:10px; font-weight:bold;">
   CADASTRAR
@@ -913,7 +913,7 @@ app.get('/cadastro-instrutor', (req, res) => {
         telefone: document.getElementById('telefone').value,
         cpf: document.getElementById('cpf').value,
         email: document.getElementById('email').value,
-        categoria_habilitacao: document.getElementById('categoria_habilitacao').value
+        categoria_cnh: document.getElementById('categoria_cnh').value
       };
 
       // limpa telefone
