@@ -1307,7 +1307,7 @@ VALUES ($1, $2, $3, $4, 'ativo')
   telefone,
   'pf',
   cpf_cnpj || null
-]
+]);
 
     res.json({
       status: 'ok',
