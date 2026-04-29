@@ -660,40 +660,35 @@ window.location.href = '/cadastro-aluno';
 app.get('/cadastro-aluno', (req, res) => {
   res.send(`
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>HabilitaPlus - Cadastro</title>
+  <title>HabilitaPlus</title>
 </head>
-<body style="font-family: Arial; padding:20px; background:#f3f6fb; color:#111;">
+<body style="font-family: Arial; padding:20px; background:#f3f6fb;">
 
-  <h2>HabilitaPlus</h2>
-  <p>Cadastro do aluno</p>
+<h2>Cadastro do aluno</h2>
 
-  <input id="nome" placeholder="Nome completo" style="display:block; margin:8px 0; padding:10px; width:280px;">
-  <input id="telefone" placeholder="Telefone" style="display:block; margin:8px 0; padding:10px; width:280px;">
-  <input id="cpf" placeholder="CPF" style="display:block; margin:8px 0; padding:10px; width:280px;">
-  <input id="email" placeholder="E-mail" style="display:block; margin:8px 0; padding:10px; width:280px;">
-  <input id="categoria_cnh" placeholder="Categoria CNH" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
+<input id="nome" placeholder="Nome completo" style="display:block; margin:8px 0; padding:10px; width:280px;">
+<input id="telefone" placeholder="Telefone" style="display:block; margin:8px 0; padding:10px; width:280px;">
+<input id="cpf" placeholder="CPF" style="display:block; margin:8px 0; padding:10px; width:280px;">
+<input id="email" placeholder="E-mail" style="display:block; margin:8px 0; padding:10px; width:280px;">
+<input id="categoria_cnh" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
 <input id="renach" placeholder="RENACH (se já tiver)" style="display:block; margin:8px 0; padding:10px; width:280px;">
-  <button style="
-  padding:14px;
-  width:280px;
-  background:#0b7cff;
-  color:white;
-  border:none;
-  border-radius:10px;
-  font-weight:bold;
-">
+
+<button id="btnCadastrar" style="padding:14px; width:280px; background:#0b7cff; color:white; border:none; border-radius:10px;">
   CADASTRAR
 </button>
-  <p id="mensagem"></p>
 
-  <script>
-   async function cadastrar() {
+<p id="mensagem"></p>
+
+<script>
+const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
+
+document.getElementById('btnCadastrar').addEventListener('click', cadastrar);
+
+async function cadastrar() {
   const mensagem = document.getElementById('mensagem');
-
-  const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
 
   const dados = {
     nome: document.getElementById('nome').value,
@@ -704,8 +699,7 @@ app.get('/cadastro-aluno', (req, res) => {
     renach: document.getElementById('renach').value
   };
 
-  // limpa telefone
-  dados.telefone = dados.telefone.replace(/\D/g, '');
+  dados.telefone = dados.telefone.replace(/\\D/g, '');
 
   if (!dados.nome || !dados.telefone) {
     mensagem.style.color = 'red';
@@ -732,7 +726,6 @@ app.get('/cadastro-aluno', (req, res) => {
       setTimeout(() => {
         window.location.href = '/aluno';
       }, 1000);
-
     } else {
       mensagem.style.color = 'red';
       mensagem.innerText = data.mensagem || 'Erro ao cadastrar';
@@ -743,12 +736,11 @@ app.get('/cadastro-aluno', (req, res) => {
     mensagem.innerText = 'Erro de conexão com servidor';
   }
 }
-    }
-  </script>
+</script>
 
 </body>
 </html>
-  `);
+`);
 });
 app.post('/instrutores', async (req, res) => {
   try {
