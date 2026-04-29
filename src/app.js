@@ -163,8 +163,31 @@ app.put('/aulas/:id/aceitar', async (req, res) => {
   SET 
     status = 'aceita',
     instrutor_id = $1,
-    repasse_instrutor = valor * 0.70,
-    repasse_app = valor * 0.30
+
+    repasse_instrutor = CASE
+      WHEN tipo_servico = 'aula_padrao' THEN valor * 0.25
+      WHEN tipo_servico = 'prova_carro' THEN valor * 0.15
+      WHEN tipo_servico = 'prova_carro_instrutor' THEN valor * 0.25
+      WHEN tipo_servico = 'prova_instrutor' THEN valor * 0.70
+      ELSE valor * 0.25
+    END,
+
+    repasse_proprietario = CASE
+      WHEN tipo_servico = 'aula_padrao' THEN valor * 0.55
+      WHEN tipo_servico = 'prova_carro' THEN valor * 0.65
+      WHEN tipo_servico = 'prova_carro_instrutor' THEN valor * 0.55
+      WHEN tipo_servico = 'prova_instrutor' THEN 0
+      ELSE valor * 0.55
+    END,
+
+    repasse_app = CASE
+      WHEN tipo_servico = 'aula_padrao' THEN valor * 0.20
+      WHEN tipo_servico = 'prova_carro' THEN valor * 0.20
+      WHEN tipo_servico = 'prova_carro_instrutor' THEN valor * 0.20
+      WHEN tipo_servico = 'prova_instrutor' THEN valor * 0.30
+      ELSE valor * 0.20
+    END
+
   WHERE id = $2
     AND status = 'pendente'
     AND valor IS NOT NULL
