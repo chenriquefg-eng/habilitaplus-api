@@ -1088,7 +1088,7 @@ async function carregar() {
 
     div.innerHTML =
       "<strong>" + dataFormatada + "</strong><br>" +
-      "Instrutor: " + (aula.instrutor_nome || 'Aguardando') + "<br>" +
+      'Instrutor: ' + (aula.instrutor_nome || 'Aguardando instrutor aceitar')
      "Status: " + (aula.status === 'aceita' ? 'Confirmada' : 'Pendente')
 
     lista.appendChild(div);
