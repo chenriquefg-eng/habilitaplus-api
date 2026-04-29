@@ -41,7 +41,7 @@ app.post('/alunos', async (req, res) => {
 
     const result = await pool.query(`
   INSERT INTO habilitaplus.alunos
-  (nome, cpf, telefone, email, categoria_cnh, ativo, autoescola_id)
+  (nome, cpf, telefone, email, categoria_cnh, processo_ativo, autoescola_id)
 VALUES ($1, $2, $3, $4, $5, false, $6)
   RETURNING *
 `, [
