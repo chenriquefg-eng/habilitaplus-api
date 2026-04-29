@@ -1289,7 +1289,8 @@ app.get('/cadastro-autoescola', (req, res) => {
 
 app.post('/proprietarios', async (req, res) => {
   try {
-   const { nome, telefone, cpf_cnpj } = req.body;
+    const { nome, telefone, cpf_cnpj } = req.body;
+
     if (!nome || !telefone) {
       return res.status(400).json({
         status: 'erro',
@@ -1299,15 +1300,14 @@ app.post('/proprietarios', async (req, res) => {
 
     const result = await pool.query(`
       INSERT INTO habilitaplus.proprietarios
-      nome, telefone, tipo, cpf_cnpj, status)
-VALUES ($1, $2, $3, $4, 'ativo')
+      (nome, telefone, tipo, cpf_cnpj, status)
+      VALUES ($1, $2, 'pf', $3, 'ativo')
       RETURNING *
     `, [
-  nome,
-  telefone,
-  'pf',
-  cpf_cnpj || null
-]);
+      nome,
+      telefone,
+      cpf_cnpj || null
+    ]);
 
     res.json({
       status: 'ok',
