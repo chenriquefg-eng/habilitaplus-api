@@ -337,67 +337,76 @@ if (!INSTRUTOR_ID) {
 }
 
     async function carregarAulas() {
-      const lista = document.getElementById('lista');
-      lista.innerHTML = 'Carregando aulas...';
+  try {
+    const resp = await fetch(API + '/aulas/pendentes');
+    const data = await resp.json();
 
-      try {
-                const resp = await fetch(API + '/aulas/pendentes');
-        const data = await resp.json();
-
-        if (!data.aulas || data.aulas.length === 0) {
-          lista.innerHTML = '<p>Nenhuma aula disponível no momento.</p>';
-          return;
-        }
-
-        lista.innerHTML = '';
-
-        data.aulas.forEach(aula => {
-          const card = document.createElement('div');
-          card.className = 'card';
-
-          const dataFormatada = aula.data_hora
-            ? new Date(aula.data_hora.replace('Z', '')).toLocaleString('pt-BR')
-            : 'Sem data';
-
-          const valorFormatado = aula.valor
-            ? Number(aula.valor).toFixed(2)
-            : '0.00';
-
-          card.innerHTML =
-            "<div class='linha'><strong>Aula #" + aula.id + "</strong></div>" +
-            "<div class='linha'>Aluno: " + (aula.aluno_nome || 'Não informado') + "</div>" +
-            "<div class='linha'>Data/Hora: " + dataFormatada + "</div>" +
-            "<div class='linha'>Duração: " + aula.duracao + " minutos</div>" +
-            "<div class='linha'>Valor: R$ " + valorFormatado + "</div>" +
-            "<button onclick='aceitarAula(" + aula.id + ", this)'>ACEITAR AULA</button>" +
-            "<button onclick='verHistorico()' style='margin-top:6px; background:#64748b; color:white;'>VER HISTÓRICO</button>";
-
-          lista.appendChild(card);
-        });
-
-      } catch (err) {
-        lista.innerHTML = '<p>Erro ao carregar aulas.</p>';
-      }
+    if (!data.aulas || data.aulas.length === 0) {
+      lista.innerHTML = '<p>Nenhuma aula disponível no momento.</p>';
+      return;
     }
 
-    function verHistorico() {
-      window.location.href = '/historico-instrutor';
-    }
+    lista.innerHTML = '';
 
-    async function aceitarAula(id, botao) {
-      botao.disabled = true;
-      botao.innerText = 'Aceitando...';
+    data.aulas.forEach(aula => {
+      const card = document.createElement('div');
+      card.className = 'card';
 
-      try {
-        const resp = await fetch(API + '/aulas/' + id + '/aceitar', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            instrutor_id: INSTRUTOR_ID
-          })
-        });
+      const dataFormatada = aula.data_hora
+        ? new Date(aula.data_hora.replace('Z', '')).toLocaleString('pt-BR')
+        : 'Sem data';
+
+      const valorFormatado = aula.valor
+        ? Number(aula.valor).toFixed(2)
+        : '0.00';
+
+      card.innerHTML =
+        "<div class='linha'><strong>Aula #" + aula.id + "</strong></div>" +
+        "<div class='linha'>Aluno: " + (aula.aluno_nome || 'Não informado') + "</div>" +
+        "<div class='linha'>Data/Hora: " + dataFormatada + "</div>" +
+        "<div class='linha'>Duração: " + aula.duracao + " minutos</div>" +
+        "<div class='linha'>Valor: R$ " + valorFormatado + "</div>" +
+        "<button onclick='aceitarAula(" + aula.id + ", this)'>ACEITAR AULA</button>" +
+        "<button onclick='verHistorico()' style='margin-top:6px; background:#64748b; color:white;'>VER HISTÓRICO</button>";
+
+      lista.appendChild(card);
+    });
+
+  } catch (err) {
+    lista.innerHTML = '<p>Erro ao carregar aulas.</p>';
+  }
+}
+
+function verHistorico() {
+  window.location.href = '/historico-instrutor';
+}
+
+async function aceitarAula(id, botao) {
+  botao.disabled = true;
+  botao.innerText = 'Aceitando...';
+
+  try {
+    const resp = await fetch(API + '/aulas/' + id + '/aceitar', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        instrutor_id: INSTRUTOR_ID
+      })
+    });
+
+    if (!resp.ok) throw new Error('Erro ao aceitar aula');
+
+    botao.innerText = 'Aceita!';
+    botao.style.background = 'green';
+
+  } catch (err) {
+    botao.disabled = false;
+    botao.innerText = 'ACEITAR AULA';
+    alert('Erro ao aceitar aula');
+  }
+}
 app.get('/aluno', (req, res) => {
   res.send(`
 <!DOCTYPE html>
