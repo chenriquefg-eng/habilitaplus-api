@@ -397,8 +397,9 @@ function verHistorico() {
         const data = await resp.json();
 
         if (data.status === 'ok') {
-          alert('Aula aceita com sucesso!');
-          carregarAulas();
+  alert('✅ Aula aceita com sucesso! O aluno verá a confirmação no histórico.');
+  carregarAulas();
+}
         } else {
           alert(data.mensagem || 'Não foi possível aceitar.');
           carregarAulas();
