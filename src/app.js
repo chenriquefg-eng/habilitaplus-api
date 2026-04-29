@@ -906,9 +906,9 @@ app.get('/cadastro-instrutor', (req, res) => {
   <input id="email" placeholder="E-mail" style="display:block; margin:8px 0; padding:10px; width:280px;">
   <input id="categoria_habilitacao" placeholder="Categoria (A, B...)" value="B" style="display:block; margin:8px 0; padding:10px; width:280px;">
 
-  <button onclick="cadastrar()" style="padding:14px; width:280px; background:#0b7cff; color:white; border:none; border-radius:10px;">
-    CADASTRAR
-  </button>
+  <button onclick="alert('clicou')" style="padding:14px; width:280px; background:#0b7cff; color:white; border:none; border-radius:10px;">
+  CADASTRAR
+</button>
 
   <p id="mensagem"></p>
 
