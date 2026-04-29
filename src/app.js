@@ -1327,6 +1327,7 @@ app.get('/cadastro-proprietario', (req, res) => {
 
   <input id="nome" placeholder="Nome"><br>
   <input id="telefone" placeholder="Telefone"><br>
+  <input id="cpf_cnpj" placeholder="CPF ou CNPJ">
 
   <button onclick="cadastrar()">Cadastrar</button>
 
