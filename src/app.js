@@ -1176,4 +1176,40 @@ carregar();
 </html>
   `);
 });
+app.post('/autoescolas', async (req, res) => {
+  try {
+    const { nome, cnpj, telefone } = req.body;
+
+    if (!nome || !telefone) {
+      return res.status(400).json({
+        status: 'erro',
+        mensagem: 'Nome e telefone são obrigatórios'
+      });
+    }
+
+    const result = await pool.query(`
+      INSERT INTO habilitaplus.autoescolas
+      (nome, cnpj, telefone, status)
+      VALUES ($1, $2, $3, 'ativa')
+      RETURNING *
+    `, [
+      nome,
+      cnpj || null,
+      telefone
+    ]);
+
+    res.status(201).json({
+      status: 'ok',
+      mensagem: 'Autoescola cadastrada com sucesso',
+      autoescola: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: error.message
+    });
+  }
+});
+
 export default app;
