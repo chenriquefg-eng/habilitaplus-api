@@ -1286,4 +1286,65 @@ app.get('/cadastro-autoescola', (req, res) => {
 </html>
   `);
 });
+
+app.post('/proprietarios', async (req, res) => {
+  try {
+    const { nome, telefone, cpf } = req.body;
+
+    if (!nome || !telefone) {
+      return res.status(400).json({
+        status: 'erro',
+        mensagem: 'Nome e telefone são obrigatórios'
+      });
+    }
+
+    const result = await pool.query(`
+      INSERT INTO habilitaplus.proprietarios
+      (nome, telefone, cpf, status)
+      VALUES ($1, $2, $3, 'ativo')
+      RETURNING *
+    `, [
+      nome,
+      telefone,
+      cpf || null
+    ]);
+
+    res.json({
+      status: 'ok',
+      proprietario: result.rows[0]
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: err.message
+    });
+  }
+});
+app.get('/cadastro-proprietario', (req, res) => {
+  res.send(`
+  <h2>Cadastro Proprietário</h2>
+
+  <input id="nome" placeholder="Nome"><br>
+  <input id="telefone" placeholder="Telefone"><br>
+
+  <button onclick="cadastrar()">Cadastrar</button>
+
+  <script>
+  async function cadastrar() {
+    const resp = await fetch('/proprietarios', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        nome: document.getElementById('nome').value,
+        telefone: document.getElementById('telefone').value
+      })
+    });
+
+    const data = await resp.json();
+    alert(data.status === 'ok' ? 'Cadastrado!' : data.mensagem);
+  }
+  </script>
+  `);
+});
 export default app;
