@@ -415,6 +415,14 @@ async function aceitarAula(id, botao) {
     alert('Erro ao aceitar aula');
   }
 }
+  }
+
+  carregarAulas();
+  </script>
+</body>
+</html>
+  `);
+});
 app.get('/aluno', (req, res) => {
   res.send(`
 <!DOCTYPE html>
