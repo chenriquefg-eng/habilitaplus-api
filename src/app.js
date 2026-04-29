@@ -341,44 +341,49 @@ if (!INSTRUTOR_ID) {
       lista.innerHTML = 'Carregando aulas...';
 
       try {
-        const resp = await fetch(API + '/aulas/pendentes');
+                const resp = await fetch(API + '/aulas/pendentes');
         const data = await resp.json();
 
         if (!data.aulas || data.aulas.length === 0) {
           lista.innerHTML = '<p>Nenhuma aula disponível no momento.</p>';
           return;
         }
-        
+
         lista.innerHTML = '';
-data.aulas.forEach(aula => {
-  const card = document.createElement('div');
-  card.className = 'card';
 
-  const dataFormatada = aula.data_hora
-    ? new Date(aula.data_hora.replace('Z', '')).toLocaleString('pt-BR')
-    : 'Sem data';
+        data.aulas.forEach(aula => {
+          const card = document.createElement('div');
+          card.className = 'card';
 
-  const valorFormatado = aula.valor
-    ? Number(aula.valor).toFixed(2)
-    : '0.00';
+          const dataFormatada = aula.data_hora
+            ? new Date(aula.data_hora.replace('Z', '')).toLocaleString('pt-BR')
+            : 'Sem data';
 
-  card.innerHTML =
-  "<div class='linha'><strong>Aula #" + aula.id + "</strong></div>" +
-  "<div class='linha'>Aluno: " + (aula.aluno_nome || 'Não informado') + "</div>" +
-  "<div class='linha'>Data/Hora: " + dataFormatada + "</div>" +
-  "<div class='linha'>Duração: " + aula.duracao + " minutos</div>" +
-  "<div class='linha'>Valor: R$ " + valorFormatado + "</div>" +
-  "<button onclick='aceitarAula(" + aula.id + ", this)'>ACEITAR AULA</button>" +
-  "<button onclick='verHistorico()' style='margin-top:6px; background:#64748b; color:white;'>VER HISTÓRICO</button>";
-  lista.appendChild(card);
-});
+          const valorFormatado = aula.valor
+            ? Number(aula.valor).toFixed(2)
+            : '0.00';
+
+          card.innerHTML =
+            "<div class='linha'><strong>Aula #" + aula.id + "</strong></div>" +
+            "<div class='linha'>Aluno: " + (aula.aluno_nome || 'Não informado') + "</div>" +
+            "<div class='linha'>Data/Hora: " + dataFormatada + "</div>" +
+            "<div class='linha'>Duração: " + aula.duracao + " minutos</div>" +
+            "<div class='linha'>Valor: R$ " + valorFormatado + "</div>" +
+            "<button onclick='aceitarAula(" + aula.id + ", this)'>ACEITAR AULA</button>" +
+            "<button onclick='verHistorico()' style='margin-top:6px; background:#64748b; color:white;'>VER HISTÓRICO</button>";
+
+          lista.appendChild(card);
+        });
+
       } catch (err) {
         lista.innerHTML = '<p>Erro ao carregar aulas.</p>';
       }
     }
-function verHistorico() {
-  window.location.href = '/historico-instrutor';
-}
+
+    function verHistorico() {
+      window.location.href = '/historico-instrutor';
+    }
+
     async function aceitarAula(id, botao) {
       botao.disabled = true;
       botao.innerText = 'Aceitando...';
@@ -393,30 +398,6 @@ function verHistorico() {
             instrutor_id: INSTRUTOR_ID
           })
         });
-
-        const data = await resp.json();
-
-        if (data.status === 'ok') {
-  alert('✅ Aula aceita com sucesso! O aluno verá a confirmação no histórico.');
-  carregarAulas();
-}
-        } else {
-          alert(data.mensagem || 'Não foi possível aceitar.');
-          carregarAulas();
-        }
-
-      } catch (err) {
-        alert('Erro ao aceitar aula.');
-        carregarAulas();
-      }
-    }
-
-    carregarAulas();
-  </script>
-</body>
-</html>
-  `);
-});
 app.get('/aluno', (req, res) => {
   res.send(`
 <!DOCTYPE html>
