@@ -416,13 +416,13 @@ async function aceitarAula(id, botao) {
   }
 }
   }
-
-  carregarAulas();
+      carregarAulas();
   </script>
 </body>
 </html>
   `);
 });
+
 app.get('/aluno', (req, res) => {
   res.send(`
 <!DOCTYPE html>
