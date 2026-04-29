@@ -1211,5 +1211,73 @@ app.post('/autoescolas', async (req, res) => {
     });
   }
 });
+app.get('/cadastro-autoescola', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>HabilitaPlus - Cadastro Autoescola</title>
+</head>
+<body style="font-family: Arial; padding:20px; background:#f3f6fb; color:#111;">
 
+  <h2>Cadastro de Autoescola</h2>
+
+  <input id="nome" placeholder="Nome da autoescola" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="cnpj" placeholder="CNPJ" style="display:block; margin:8px 0; padding:10px; width:280px;">
+  <input id="telefone" placeholder="Telefone" style="display:block; margin:8px 0; padding:10px; width:280px;">
+
+  <button id="btnCadastrar" type="button" style="padding:14px; width:280px; background:#0b7cff; color:white; border:none; border-radius:10px; font-weight:bold;">
+    CADASTRAR
+  </button>
+
+  <p id="mensagem"></p>
+
+  <script>
+    const API = 'https://automatizar-marketing-habilita-plus.hhxl33.easypanel.host';
+
+    document.getElementById('btnCadastrar').addEventListener('click', cadastrar);
+
+    async function cadastrar() {
+      const mensagem = document.getElementById('mensagem');
+
+      const dados = {
+        nome: document.getElementById('nome').value,
+        cnpj: document.getElementById('cnpj').value.replace(/\\D/g, ''),
+        telefone: document.getElementById('telefone').value.replace(/\\D/g, '')
+      };
+
+      if (!dados.nome || !dados.telefone) {
+        mensagem.style.color = 'red';
+        mensagem.innerText = 'Nome e telefone são obrigatórios';
+        return;
+      }
+
+      try {
+        const resp = await fetch(API + '/autoescolas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        });
+
+        const data = await resp.json();
+
+        if (data.status === 'ok') {
+          mensagem.style.color = 'green';
+          mensagem.innerText = 'Autoescola cadastrada com sucesso!';
+        } else {
+          mensagem.style.color = 'red';
+          mensagem.innerText = data.mensagem || 'Erro ao cadastrar';
+        }
+      } catch (err) {
+        mensagem.style.color = 'red';
+        mensagem.innerText = 'Erro de conexão com servidor';
+      }
+    }
+  </script>
+
+</body>
+</html>
+  `);
+});
 export default app;
