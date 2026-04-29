@@ -1300,13 +1300,13 @@ app.post('/proprietarios', async (req, res) => {
 
     const result = await pool.query(`
       INSERT INTO habilitaplus.proprietarios
-      (nome, telefone, cpf, status)
+      (nome, telefone, cpf_cnpj, status)
       VALUES ($1, $2, $3, 'ativo')
       RETURNING *
     `, [
       nome,
       telefone,
-      cpf || null
+      cpf_cnpj || null
     ]);
 
     res.json({
