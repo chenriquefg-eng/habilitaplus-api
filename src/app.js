@@ -555,7 +555,7 @@ const aluno_nome = localStorage.getItem('aluno_nome');
           mensagem.style.color = 'green';
           mensagem.innerHTML = '✅ Aula solicitada com sucesso!<br>Aguarde um instrutor aceitar.';
 setTimeout(() => {
-  window.location.href = '/instrutor';
+ window.location.href = '/historico-aluno';
 }, 1500);
         } else {
           mensagem.style.color = 'red';
