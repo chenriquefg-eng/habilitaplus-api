@@ -337,6 +337,8 @@ if (!INSTRUTOR_ID) {
 }
 
     async function carregarAulas() {
+  const lista = document.getElementById('lista');
+
   try {
     const resp = await fetch(API + '/aulas/pendentes');
     const data = await resp.json();
@@ -396,10 +398,16 @@ async function aceitarAula(id, botao) {
       })
     });
 
-    if (!resp.ok) throw new Error('Erro ao aceitar aula');
+    const data = await resp.json();
 
-    botao.innerText = 'Aceita!';
-    botao.style.background = 'green';
+    if (data.status === 'ok') {
+      alert('Aula aceita com sucesso!');
+      carregarAulas();
+    } else {
+      botao.disabled = false;
+      botao.innerText = 'ACEITAR AULA';
+      alert(data.mensagem || 'Erro ao aceitar aula');
+    }
 
   } catch (err) {
     botao.disabled = false;
