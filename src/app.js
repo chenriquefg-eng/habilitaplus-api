@@ -100,6 +100,7 @@ app.post('/aulas', async (req, res) => {
       duracao,
       valor
     } = req.body;
+const tipo_servico = 'aula_padrao';    
 const dataAula = new Date(data_hora);
 const agora = new Date();
 const limiteMinimo = new Date(agora.getTime() + 30 * 60000);
@@ -119,8 +120,8 @@ if (dataAula < limiteMinimo) {
 }
     const result = await pool.query(`
       INSERT INTO habilitaplus.aulas
-      (aluno_id, instrutor_id, veiculo_id, pacote_id, data_hora, duracao, valor, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendente')
+(aluno_id, instrutor_id, veiculo_id, pacote_id, data_hora, duracao, valor, status, tipo_servico)
+VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendente', $8)
       RETURNING *
     `, [
       aluno_id,
@@ -129,7 +130,8 @@ if (dataAula < limiteMinimo) {
       pacote_id || null,
       data_hora,
       duracao || 50,
-      valor || null
+      valor || null,
+      tipo_servico
     ]);
 
     res.status(201).json({
