@@ -1511,6 +1511,7 @@ let totalInstrutor = 0;
 let totalProprietario = 0;
 
 data.aulas.forEach(function(a) {
+  if (a.status !== 'aceita') return;
   totalApp += Number(a.repasse_app || 0);
   totalInstrutor += Number(a.repasse_instrutor || 0);
   totalProprietario += Number(a.repasse_proprietario || 0);
