@@ -91,14 +91,14 @@ app.get('/aulas', async (req, res) => {
 app.post('/aulas', async (req, res) => {
   try {
     const {
-      aluno_id,
-      instrutor_id,
-      veiculo_id,
-      pacote_id,
-      data_hora,
-      duracao,
-      valor
-    } = req.body;
+  aluno_id,
+  instrutor_id,
+  veiculo_id,
+  pacote_id,
+  data_hora,
+  duracao,
+  valor
+} = req.body;
 const tipo_servico = 'aula_padrao';    
 const dataAula = new Date(data_hora);
 const agora = new Date();
