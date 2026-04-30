@@ -1494,39 +1494,19 @@ app.get('/admin/aulas', async (req, res) => {
 });
 app.get('/admin', (req, res) => {
   res.send(`
-  <h2>Painel Admin</h2>
-  <div id="lista">Carregando...</div>
+<h2>Painel Admin</h2>
+<div id="lista">Carregando...</div>
 
-  <script>
-  async function carregar() {
-    const resp = await fetch('/admin/aulas');
-    const data = await resp.json();
+<script>
+async function carregar() {
+  const resp = await fetch('/admin/aulas');
+  const data = await resp.json();
 
-    let html = '';
+  document.getElementById('lista').innerText = JSON.stringify(data, null, 2);
+}
 
-    data.aulas.forEach(a => {
-  const cor = a.status === 'aceita' ? '#dcfce7' : '#f1f5f9';
-
- html += `
-  <div style="border:1px solid #ccc; padding:10px; margin:10px; background:\${cor}; border-radius:8px;">
-    <b>Aula #\${a.id}</b><br>
-    Aluno: \${a.aluno || '-'}<br>
-    Instrutor: \${a.instrutor || '-'}<br>
-    Veículo: \${a.veiculo || '-'}<br>
-    Valor: R$ \${a.valor}<br>
-    Status: \${a.status}<br>
-    Repasse Instrutor: R$ \${a.repasse_instrutor || 0}<br>
-    Repasse Proprietário: R$ \${a.repasse_proprietario || 0}<br>
-    <b style="color:#16a34a;">App ganha: R$ \${a.repasse_app || 0}</b>
-  </div>
-`;
-    });
-
-    document.getElementById('lista').innerHTML = html;
-  }
-
-  carregar();
-  </script>
-  `);
+carregar();
+</script>
+`);
 });
 export default app;
