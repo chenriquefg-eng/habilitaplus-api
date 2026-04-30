@@ -1491,7 +1491,7 @@ app.get('/admin/aulas', async (req, res) => {
   }
 });
 app.get('/admin', (req, res) => {
- res.send(`
+  res.send(`
 <!DOCTYPE html>
 <html>
 <head>
@@ -1510,10 +1510,36 @@ app.get('/admin', (req, res) => {
       color: white;
       padding: 15px;
       font-size: 20px;
+      font-weight: bold;
     }
 
     .container {
       padding: 15px;
+    }
+
+    .resumo {
+      background: #e2e8f0;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .filtros {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .filtros button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #1e293b;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
     }
 
     .card {
@@ -1521,6 +1547,11 @@ app.get('/admin', (req, res) => {
       padding: 15px;
       margin-bottom: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.15s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.01);
     }
 
     .card.ok {
@@ -1529,24 +1560,6 @@ app.get('/admin', (req, res) => {
 
     .card.pendente {
       background: #f1f5f9;
-    }
-.card {
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: transform 0.15s ease;
-}
-
-.card:hover {
-  transform: scale(1.01);
-}
-    .resumo {
-      background: #e2e8f0;
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      font-weight: bold;
     }
 
     .linha {
@@ -1562,45 +1575,43 @@ app.get('/admin', (req, res) => {
 <div class="container">
   <div id="resumo" class="resumo">Carregando resumo...</div>
 
-<div style="margin:10px 0;">
-  <button onclick="filtrar('todas')">Todas</button>
-  <button onclick="filtrar('pendente')">Pendentes</button>
-  <button onclick="filtrar('aceita')">Confirmadas</button>
+  <div class="filtros">
+    <button onclick="filtrar('todas')">Todas</button>
+    <button onclick="filtrar('pendente')">Pendentes</button>
+    <button onclick="filtrar('aceita')">Confirmadas</button>
+  </div>
+
+  <div id="lista">Carregando...</div>
 </div>
-
-<div id="lista">Carregando...</div>
-
-<div id="resumo" style="padding:10px; background:#e2e8f0; margin:10px; border-radius:8px;">
-  Carregando resumo...
-</div>
-
-<div id="lista">Carregando...</div>
 
 <script>
+let filtroAtual = 'todas';
+let aulasCache = [];
+
 function filtrar(tipo) {
   filtroAtual = tipo;
-  carregar();
+  renderizar();
 }
+
 async function carregar() {
   const resp = await fetch('/admin/aulas');
   const data = await resp.json();
-  aulasCache = data.aulas;
+
+  aulasCache = data.aulas || [];
+  renderizar();
+}
+
+function renderizar() {
   const lista = document.getElementById('lista');
   const resumo = document.getElementById('resumo');
 
   lista.innerHTML = '';
-  resumo.innerHTML =
-  '<div style="display:flex; gap:20px; flex-wrap:wrap;">' +
-    '<div>💰 <b>App</b><br>R$ ' + totalApp.toFixed(2) + '</div>' +
-    '<div>👨‍🏫 <b>Instrutores</b><br>R$ ' + totalInstrutor.toFixed(2) + '</div>' +
-    '<div>🚘 <b>Proprietários</b><br>R$ ' + totalProprietario.toFixed(2) + '</div>' +
-  '</div>';
 
   let totalApp = 0;
   let totalInstrutor = 0;
   let totalProprietario = 0;
 
-  data.aulas.forEach(function(a) {
+  aulasCache.forEach(function(a) {
     if (a.status !== 'aceita') return;
 
     totalApp += Number(a.repasse_app || 0);
@@ -1614,36 +1625,32 @@ async function carregar() {
       '<div>👨‍🏫 <b>Instrutores</b><br>R$ ' + totalInstrutor.toFixed(2) + '</div>' +
       '<div>🚘 <b>Proprietários</b><br>R$ ' + totalProprietario.toFixed(2) + '</div>' +
     '</div>';
-<div style="margin:10px 0;">
-  <button onclick="filtrar('todas')">Todas</button>
-  <button onclick="filtrar('pendente')">Pendentes</button>
-  <button onclick="filtrar('aceita')">Confirmadas</button>
-</div>
 
   aulasCache
-  .filter(function(a) {
-    if (filtroAtual === 'todas') return true;
-    return a.status === filtroAtual;
-  })
-  .forEach(function(a) {
-    const div = document.createElement('div');
-    div.className = 'card ' + (a.status === 'aceita' ? 'ok' : 'pendente');
+    .filter(function(a) {
+      if (filtroAtual === 'todas') return true;
+      return a.status === filtroAtual;
+    })
+    .forEach(function(a) {
+      const div = document.createElement('div');
+      div.className = 'card ' + (a.status === 'aceita' ? 'ok' : 'pendente');
 
-    const statusTexto = a.status === 'aceita' ? '✅ Confirmada' : '⏳ Pendente';
+      const statusTexto = a.status === 'aceita' ? '✅ Confirmada' : '⏳ Pendente';
 
-    div.innerHTML =
-      '<div class="linha" style="font-size:18px;"><b>🚗 Aula #' + a.id + '</b></div>' +
-      '<div class="linha"><b>Aluno:</b> ' + (a.aluno || '-') + '</div>' +
-      '<div class="linha"><b>Instrutor:</b> ' + (a.instrutor || '-') + '</div>' +
-      '<div class="linha"><b>Veículo:</b> ' + (a.veiculo || '-') + '</div>' +
-      '<div class="linha"><b>Valor:</b> R$ ' + a.valor + '</div>' +
-      '<div class="linha"><b>Status:</b> ' + statusTexto + '</div>' +
-      '<div class="linha">💸 <b>Instrutor:</b> R$ ' + (a.repasse_instrutor || 0) + '</div>' +
-      '<div class="linha">🚘 <b>Proprietário:</b> R$ ' + (a.repasse_proprietario || 0) + '</div>' +
-      '<div class="linha" style="color:#16a34a;"><b>App: R$ ' + (a.repasse_app || 0) + '</b></div>';
+      div.innerHTML =
+        '<div class="linha" style="font-size:18px;"><b>🚗 Aula #' + a.id + '</b></div>' +
+        '<div class="linha"><b>Aluno:</b> ' + (a.aluno || '-') + '</div>' +
+        '<div class="linha"><b>Instrutor:</b> ' + (a.instrutor || '-') + '</div>' +
+        '<div class="linha"><b>Veículo:</b> ' + (a.veiculo || '-') + '</div>' +
+        '<div class="linha"><b>Valor:</b> R$ ' + a.valor + '</div>' +
+        '<div class="linha"><b>Status:</b> ' + statusTexto + '</div>' +
+        '<div class="linha">💸 <b>Instrutor:</b> R$ ' + (a.repasse_instrutor || 0) + '</div>' +
+        '<div class="linha">🚘 <b>Proprietário:</b> R$ ' + (a.repasse_proprietario || 0) + '</div>' +
+        '<div class="linha" style="color:#16a34a;"><b>App: R$ ' + (a.repasse_app || 0) + '</b></div>';
 
-    lista.appendChild(div);
-  });
+      lista.appendChild(div);
+    });
+}
 
 carregar();
 </script>
