@@ -1508,7 +1508,7 @@ app.get('/admin', (req, res) => {
   const cor = a.status === 'aceita' ? '#dcfce7' : '#f1f5f9';
 
  html += `
-  <div style="border:1px solid #ccc; padding:10px; margin:10px; background:${cor}; border-radius:8px;">
+  <div style="border:1px solid #ccc; padding:10px; margin:10px; background:\${cor}; border-radius:8px;">
     <b>Aula #\${a.id}</b><br>
     Aluno: \${a.aluno || '-'}<br>
     Instrutor: \${a.instrutor || '-'}<br>
