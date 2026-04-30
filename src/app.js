@@ -1592,7 +1592,28 @@ function filtrar(tipo) {
   filtroAtual = tipo;
   renderizar();
 }
+async function aceitarAula(id) {
+  const instrutorId = prompt('Digite o ID do instrutor:');
 
+  if (!instrutorId) return;
+
+  const resp = await fetch('/aulas/' + id + '/aceitar', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      instrutor_id: Number(instrutorId)
+    })
+  });
+
+  if (resp.ok) {
+    alert('Aula aceita com sucesso!');
+    carregar();
+  } else {
+    alert('Erro ao aceitar aula');
+  }
+}
 async function carregar() {
   const resp = await fetch('/admin/aulas');
   const data = await resp.json();
@@ -1647,7 +1668,7 @@ function renderizar() {
         '<div class="linha">💸 <b>Instrutor:</b> R$ ' + (a.repasse_instrutor || 0) + '</div>' +
         '<div class="linha">🚘 <b>Proprietário:</b> R$ ' + (a.repasse_proprietario || 0) + '</div>' +
         '<div class="linha" style="color:#16a34a;"><b>App: R$ ' + (a.repasse_app || 0) + '</b></div>';
-
++ '<button onclick="aceitarAula(' + a.id + ')" style="margin-top:10px; padding:8px; border:none; border-radius:6px; background:#16a34a; color:white; cursor:pointer;">ACEITAR</button>'
       lista.appendChild(div);
     });
 }
