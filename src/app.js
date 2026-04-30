@@ -1071,11 +1071,12 @@ const aluno_id = localStorage.getItem('aluno_id');
 if (!aluno_id) {
   window.location.href = '/login';
 }
-
+let filtroAtual = 'todas';
+let aulasCache = [];
 async function carregar() {
   const resp = await fetch(API + '/aulas/aluno/' + aluno_id);
   const data = await resp.json();
-
+  aulasCache = data.aulas;
   const lista = document.getElementById('lista');
 
   if (!data.aulas.length) {
@@ -1626,9 +1627,7 @@ async function carregar() {
 
     lista.appendChild(div);
   });
-}
-let filtroAtual = 'todas';
-let aulasCache = [];
+
 carregar();
 </script>
 
