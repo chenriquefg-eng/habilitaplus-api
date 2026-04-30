@@ -1493,8 +1493,68 @@ app.get('/admin/aulas', async (req, res) => {
   }
 });
 app.get('/admin', (req, res) => {
-  res.send(`
-<h2>Painel Admin</h2>
+ res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HabilitaPlus Admin</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8fafc;
+      margin: 0;
+    }
+
+    .header {
+      background: #1e293b;
+      color: white;
+      padding: 15px;
+      font-size: 20px;
+    }
+
+    .container {
+      padding: 15px;
+    }
+
+    .card {
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .card.ok {
+      background: #dcfce7;
+    }
+
+    .card.pendente {
+      background: #f1f5f9;
+    }
+
+    .resumo {
+      background: #e2e8f0;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .linha {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="header">HabilitaPlus • Painel</div>
+
+<div class="container">
+  <div id="resumo" class="resumo">Carregando resumo...</div>
+  <div id="lista">Carregando...</div>
+</div>
 
 <div id="resumo" style="padding:10px; background:#e2e8f0; margin:10px; border-radius:8px;">
   Carregando resumo...
@@ -1551,6 +1611,9 @@ document.getElementById('resumo').innerHTML =
 
 carregar();
 </script>
+
+</body>
+</html>
 `);
 });
 export default app;
