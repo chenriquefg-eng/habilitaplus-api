@@ -1505,8 +1505,10 @@ app.get('/admin', (req, res) => {
     let html = '';
 
     data.aulas.forEach(a => {
-      html += \`
-        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+  const cor = a.status === 'aceita' ? '#dcfce7' : '#f1f5f9';
+
+  html += `
+    <div style="border:1px solid #ccc; padding:10px; margin:10px; background:${cor}; border-radius:8px;">
           <b>Aula #\${a.id}</b><br>
           Aluno: \${a.aluno || '-'}<br>
           Instrutor: \${a.instrutor || '-'}<br>
@@ -1515,7 +1517,7 @@ app.get('/admin', (req, res) => {
           Status: \${a.status}<br>
           Repasse Instrutor: R$ \${a.repasse_instrutor || 0}<br>
           Repasse Proprietário: R$ \${a.repasse_proprietario || 0}<br>
-          Repasse App: R$ \${a.repasse_app || 0}
+          <b style="color:#16a34a;">App ganha: R$ ${a.repasse_app || 0}</b>
         </div>
       \`;
     });
