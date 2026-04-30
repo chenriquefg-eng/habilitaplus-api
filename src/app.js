@@ -1350,7 +1350,7 @@ app.get('/cadastro-proprietario', (req, res) => {
 });
 app.post('/veiculos', async (req, res) => {
   try {
-    const { proprietario_id, modelo, placa, ano } = req.body;
+    const { proprietario_id, modelo, placa, ano, tipo } = req.body;
 
     if (!proprietario_id || !modelo || !placa) {
       return res.status(400).json({
@@ -1362,15 +1362,15 @@ app.post('/veiculos', async (req, res) => {
     const result = await pool.query(`
   INSERT INTO habilitaplus.veiculos
   (proprietario_id, modelo, placa, ano, tipo, status)
-  VALUES ($1, $2, $3, $4, 'carro', 'ativo')
+  VALUES ($1, $2, $3, $4, $5, 'ativo')
   RETURNING *
 `, [
   proprietario_id,
   modelo,
   placa,
-  ano || null
+  ano || null,
+  tipo || 'carro'
 ]);
-
     res.json({
       status: 'ok',
       veiculo: result.rows[0]
@@ -1390,6 +1390,11 @@ app.get('/cadastro-veiculo', (req, res) => {
   <input id="proprietario_id" placeholder="ID do proprietário"><br>
   <input id="modelo" placeholder="Modelo"><br>
   <input id="placa" placeholder="Placa"><br>
+  <select id="tipo">
+  <option value="carro">Carro</option>
+  <option value="moto">Moto</option>
+  <option value="caminhao">Caminhão</option>
+</select><br>
 
   <button onclick="cadastrar()">Cadastrar</button>
 
