@@ -1416,5 +1416,44 @@ app.get('/cadastro-veiculo', (req, res) => {
   </script>
   `);
 });
+app.put('/veiculos/:id/vincular-instrutor', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { instrutor_id } = req.body;
+
+    if (!instrutor_id) {
+      return res.status(400).json({
+        status: 'erro',
+        mensagem: 'Informe o instrutor_id'
+      });
+    }
+
+    const result = await pool.query(`
+      UPDATE habilitaplus.veiculos
+      SET instrutor_id = $1
+      WHERE id = $2
+      RETURNING *
+    `, [instrutor_id, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        status: 'erro',
+        mensagem: 'Veículo não encontrado'
+      });
+    }
+
+    res.json({
+      status: 'ok',
+      mensagem: 'Veículo vinculado ao instrutor com sucesso',
+      veiculo: result.rows[0]
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: err.message
+    });
+  }
+});
 
 export default app;
