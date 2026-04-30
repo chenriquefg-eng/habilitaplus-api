@@ -1606,8 +1606,8 @@ async function aceitarAula(id) {
   const instrutores = await respInstrutores.json();
 
   const escolha = prompt(
-    'Escolha o ID do instrutor:\n\n' +
-    instrutores.map(i => i.id + ' - ' + i.nome).join('\n')
+    'Escolha o ID do instrutor:\\n\\n' +
+instrutores.map(i => i.id + ' - ' + i.nome).join('\\n')
   );
 
   if (!escolha) return;
