@@ -1495,13 +1495,31 @@ app.get('/admin/aulas', async (req, res) => {
 app.get('/admin', (req, res) => {
   res.send(`
 <h2>Painel Admin</h2>
+
+<div id="resumo" style="padding:10px; background:#e2e8f0; margin:10px; border-radius:8px;">
+  Carregando resumo...
+</div>
+
 <div id="lista">Carregando...</div>
 
 <script>
 async function carregar() {
   const resp = await fetch('/admin/aulas');
   const data = await resp.json();
+  let totalApp = 0;
+let totalInstrutor = 0;
+let totalProprietario = 0;
 
+data.aulas.forEach(function(a) {
+  totalApp += Number(a.repasse_app || 0);
+  totalInstrutor += Number(a.repasse_instrutor || 0);
+  totalProprietario += Number(a.repasse_proprietario || 0);
+});
+
+document.getElementById('resumo').innerHTML =
+  '<b>Total App:</b> R$ ' + totalApp.toFixed(2) + ' | ' +
+  '<b>Instrutores:</b> R$ ' + totalInstrutor.toFixed(2) + ' | ' +
+  '<b>Proprietários:</b> R$ ' + totalProprietario.toFixed(2);
   const lista = document.getElementById('lista');
   lista.innerHTML = '';
 
