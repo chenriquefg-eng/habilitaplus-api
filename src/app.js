@@ -1577,6 +1577,10 @@ app.get('/admin', (req, res) => {
 <div id="lista">Carregando...</div>
 
 <script>
+function filtrar(tipo) {
+  filtroAtual = tipo;
+  carregar();
+}
 async function carregar() {
   const resp = await fetch('/admin/aulas');
   const data = await resp.json();
