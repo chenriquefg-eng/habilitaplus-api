@@ -1502,7 +1502,32 @@ async function carregar() {
   const resp = await fetch('/admin/aulas');
   const data = await resp.json();
 
-  document.getElementById('lista').innerText = JSON.stringify(data, null, 2);
+  const lista = document.getElementById('lista');
+  lista.innerHTML = '';
+
+  data.aulas.forEach(function(a) {
+    const cor = a.status === 'aceita' ? '#dcfce7' : '#f1f5f9';
+
+    const div = document.createElement('div');
+    div.style.border = '1px solid #ccc';
+    div.style.padding = '12px';
+    div.style.margin = '12px';
+    div.style.background = cor;
+    div.style.borderRadius = '8px';
+
+    div.innerHTML =
+      '<b>Aula #' + a.id + '</b><br>' +
+      'Aluno: ' + (a.aluno || '-') + '<br>' +
+      'Instrutor: ' + (a.instrutor || '-') + '<br>' +
+      'Veículo: ' + (a.veiculo || '-') + '<br>' +
+      'Valor: R$ ' + a.valor + '<br>' +
+      'Status: ' + a.status + '<br>' +
+      'Repasse Instrutor: R$ ' + (a.repasse_instrutor || 0) + '<br>' +
+      'Repasse Proprietário: R$ ' + (a.repasse_proprietario || 0) + '<br>' +
+      '<b style="color:#16a34a;">App ganha: R$ ' + (a.repasse_app || 0) + '</b>';
+
+    lista.appendChild(div);
+  });
 }
 
 carregar();
