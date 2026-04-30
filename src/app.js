@@ -748,7 +748,15 @@ async function cadastrar() {
 </html>
 `);
 });
+app.get('/instrutores', async (req, res) => {
+  const result = await pool.query(`
+    SELECT id, nome
+    FROM habilitaplus.instrutores
+    ORDER BY nome
+  `);
 
+  res.json(result.rows);
+});
 app.post('/instrutores', async (req, res) => {
   try {
     const {
@@ -1622,16 +1630,19 @@ async function aceitarAula(id) {
   }
 }
 async function carregar() {
-  const resp = await fetch('/admin/aulas');
-  const data = await resp.json();
+  try {
+    const resp = await fetch('/admin/aulas');
+    const data = await resp.json();
 
-  aulasCache = data.aulas || [];
-  renderizar();
+    aulasCache = data.aulas || [];
+    renderizar();
+
+  } catch (err) {
+    document.getElementById('resumo').innerHTML = 'Erro ao carregar resumo';
+    document.getElementById('lista').innerHTML = 'Erro: ' + err.message;
+    console.error(err);
+  }
 }
-
-function renderizar() {
-  const lista = document.getElementById('lista');
-  const resumo = document.getElementById('resumo');
 
   lista.innerHTML = '';
 
