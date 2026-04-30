@@ -1404,11 +1404,11 @@ app.get('/cadastro-veiculo', (req, res) => {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        proprietario_id: document.getElementById('proprietario_id').value,
-        modelo: document.getElementById('modelo').value,
-        placa: document.getElementById('placa').value
-      })
-    });
+  proprietario_id: document.getElementById('proprietario_id').value,
+  modelo: document.getElementById('modelo').value,
+  placa: document.getElementById('placa').value,
+  tipo: document.getElementById('tipo').value
+})
 
     const data = await resp.json();
     alert(data.status === 'ok' ? 'Veículo cadastrado!' : data.mensagem);
