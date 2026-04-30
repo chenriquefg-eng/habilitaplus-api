@@ -1532,7 +1532,17 @@ app.get('/admin', (req, res) => {
     .card.pendente {
       background: #f1f5f9;
     }
+.card {
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.15s ease;
+}
 
+.card:hover {
+  transform: scale(1.01);
+}
     .resumo {
       background: #e2e8f0;
       padding: 12px;
@@ -1578,11 +1588,15 @@ data.aulas.forEach(function(a) {
 });
 
 document.getElementById('resumo').innerHTML =
-  '<b>Total App:</b> R$ ' + totalApp.toFixed(2) + ' | ' +
-  '<b>Instrutores:</b> R$ ' + totalInstrutor.toFixed(2) + ' | ' +
-  '<b>Proprietários:</b> R$ ' + totalProprietario.toFixed(2);
-  const lista = document.getElementById('lista');
-  lista.innerHTML = '';
+  '<div style="display:flex; gap:20px; flex-wrap:wrap;">' +
+
+  '<div>💰 <b>App</b><br>R$ ' + totalApp.toFixed(2) + '</div>' +
+
+  '<div>👨‍🏫 <b>Instrutores</b><br>R$ ' + totalInstrutor.toFixed(2) + '</div>' +
+
+  '<div>🚘 <b>Proprietários</b><br>R$ ' + totalProprietario.toFixed(2) + '</div>' +
+
+  '</div>';
 
   data.aulas.forEach(function(a) {
     const cor = a.status === 'aceita' ? '#dcfce7' : '#f1f5f9';
