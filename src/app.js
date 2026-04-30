@@ -1360,16 +1360,16 @@ app.post('/veiculos', async (req, res) => {
     }
 
     const result = await pool.query(`
-      INSERT INTO habilitaplus.veiculos
-      (proprietario_id, modelo, placa, ano, status)
-      VALUES ($1, $2, $3, $4, 'ativo')
-      RETURNING *
-    `, [
-      proprietario_id,
-      modelo,
-      placa,
-      ano || null
-    ]);
+  INSERT INTO habilitaplus.veiculos
+  (proprietario_id, modelo, placa, ano, tipo, status)
+  VALUES ($1, $2, $3, $4, 'carro', 'ativo')
+  RETURNING *
+`, [
+  proprietario_id,
+  modelo,
+  placa,
+  ano || null
+]);
 
     res.json({
       status: 'ok',
