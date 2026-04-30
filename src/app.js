@@ -1587,23 +1587,18 @@ document.getElementById('resumo').innerHTML =
   data.aulas.forEach(function(a) {
     const cor = a.status === 'aceita' ? '#dcfce7' : '#f1f5f9';
 
-    const div = document.createElement('div');
-    div.style.border = '1px solid #ccc';
-    div.style.padding = '12px';
-    div.style.margin = '12px';
-    div.style.background = cor;
-    div.style.borderRadius = '8px';
+    const statusTexto = a.status === 'aceita' ? '✅ Confirmada' : '⏳ Pendente';
 
-    div.innerHTML =
-      '<b>Aula #' + a.id + '</b><br>' +
-      'Aluno: ' + (a.aluno || '-') + '<br>' +
-      'Instrutor: ' + (a.instrutor || '-') + '<br>' +
-      'Veículo: ' + (a.veiculo || '-') + '<br>' +
-      'Valor: R$ ' + a.valor + '<br>' +
-      'Status: ' + a.status + '<br>' +
-      'Repasse Instrutor: R$ ' + (a.repasse_instrutor || 0) + '<br>' +
-      'Repasse Proprietário: R$ ' + (a.repasse_proprietario || 0) + '<br>' +
-      '<b style="color:#16a34a;">App ganha: R$ ' + (a.repasse_app || 0) + '</b>';
+div.innerHTML =
+  '<div class="linha" style="font-size:18px;"><b>🚗 Aula #' + a.id + '</b></div>' +
+  '<div class="linha">Aluno: ' + (a.aluno || '-') + '</div>' +
+  '<div class="linha">Instrutor: ' + (a.instrutor || '-') + '</div>' +
+  '<div class="linha">Veículo: ' + (a.veiculo || '-') + '</div>' +
+  '<div class="linha">Valor: R$ ' + a.valor + '</div>' +
+  '<div class="linha">Status: ' + statusTexto + '</div>' +
+  '<div class="linha">Instrutor: R$ ' + (a.repasse_instrutor || 0) + '</div>' +
+  '<div class="linha">Proprietário: R$ ' + (a.repasse_proprietario || 0) + '</div>' +
+  '<div class="linha" style="color:#16a34a;"><b>App: R$ ' + (a.repasse_app || 0) + '</b></div>';
 
     lista.appendChild(div);
   });
