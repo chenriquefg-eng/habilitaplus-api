@@ -1455,5 +1455,76 @@ app.put('/veiculos/:id/vincular-instrutor', async (req, res) => {
     });
   }
 });
+app.get('/admin/aulas', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        a.id,
+        a.data_hora,
+        a.valor,
+        a.status,
+        a.repasse_instrutor,
+        a.repasse_proprietario,
+        a.repasse_app,
 
+        al.nome AS aluno,
+        i.nome AS instrutor,
+        v.modelo AS veiculo
+
+      FROM habilitaplus.aulas a
+      LEFT JOIN habilitaplus.alunos al ON al.id = a.aluno_id
+      LEFT JOIN habilitaplus.instrutores i ON i.id = a.instrutor_id
+      LEFT JOIN habilitaplus.veiculos v ON v.id = a.veiculo_id
+
+      ORDER BY a.id DESC
+      LIMIT 50
+    `);
+
+    res.json({
+      status: 'ok',
+      aulas: result.rows
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: err.message
+    });
+  }
+});
+app.get('/admin', (req, res) => {
+  res.send(`
+  <h2>Painel Admin</h2>
+  <div id="lista">Carregando...</div>
+
+  <script>
+  async function carregar() {
+    const resp = await fetch('/admin/aulas');
+    const data = await resp.json();
+
+    let html = '';
+
+    data.aulas.forEach(a => {
+      html += \`
+        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+          <b>Aula #\${a.id}</b><br>
+          Aluno: \${a.aluno || '-'}<br>
+          Instrutor: \${a.instrutor || '-'}<br>
+          Veículo: \${a.veiculo || '-'}<br>
+          Valor: R$ \${a.valor}<br>
+          Status: \${a.status}<br>
+          Repasse Instrutor: R$ \${a.repasse_instrutor || 0}<br>
+          Repasse Proprietário: R$ \${a.repasse_proprietario || 0}<br>
+          Repasse App: R$ \${a.repasse_app || 0}
+        </div>
+      \`;
+    });
+
+    document.getElementById('lista').innerHTML = html;
+  }
+
+  carregar();
+  </script>
+  `);
+});
 export default app;
