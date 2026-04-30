@@ -748,15 +748,7 @@ async function cadastrar() {
 </html>
 `);
 });
-app.get('/instrutores', async (req, res) => {
-  const result = await pool.query(`
-    SELECT id, nome
-    FROM habilitaplus.instrutores
-    ORDER BY nome
-  `);
 
-  res.json(result.rows);
-});
 app.post('/instrutores', async (req, res) => {
   try {
     const {
