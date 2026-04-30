@@ -1348,4 +1348,68 @@ app.get('/cadastro-proprietario', (req, res) => {
   </script>
   `);
 });
+app.post('/veiculos', async (req, res) => {
+  try {
+    const { proprietario_id, modelo, placa, ano } = req.body;
+
+    if (!proprietario_id || !modelo || !placa) {
+      return res.status(400).json({
+        status: 'erro',
+        mensagem: 'Dados obrigatórios faltando'
+      });
+    }
+
+    const result = await pool.query(`
+      INSERT INTO habilitaplus.veiculos
+      (proprietario_id, modelo, placa, ano, status)
+      VALUES ($1, $2, $3, $4, 'ativo')
+      RETURNING *
+    `, [
+      proprietario_id,
+      modelo,
+      placa,
+      ano || null
+    ]);
+
+    res.json({
+      status: 'ok',
+      veiculo: result.rows[0]
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      status: 'erro',
+      mensagem: err.message
+    });
+  }
+});
+app.get('/cadastro-veiculo', (req, res) => {
+  res.send(`
+  <h2>Cadastro Veículo</h2>
+
+  <input id="proprietario_id" placeholder="ID do proprietário"><br>
+  <input id="modelo" placeholder="Modelo"><br>
+  <input id="placa" placeholder="Placa"><br>
+
+  <button onclick="cadastrar()">Cadastrar</button>
+
+  <script>
+  async function cadastrar() {
+    const resp = await fetch('/veiculos', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        proprietario_id: document.getElementById('proprietario_id').value,
+        modelo: document.getElementById('modelo').value,
+        placa: document.getElementById('placa').value
+      })
+    });
+
+    const data = await resp.json();
+    alert(data.status === 'ok' ? 'Veículo cadastrado!' : data.mensagem);
+  }
+  </script>
+  `);
+});
+
 export default app;
