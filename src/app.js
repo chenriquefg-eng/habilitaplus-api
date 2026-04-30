@@ -1071,13 +1071,10 @@ const aluno_id = localStorage.getItem('aluno_id');
 if (!aluno_id) {
   window.location.href = '/login';
 }
-let filtroAtual = 'todas';
-let aulasCache = [];
-async function carregar() {
   const resp = await fetch(API + '/aulas/aluno/' + aluno_id);
   const data = await resp.json();
   aulasCache = data.aulas;
-  const lista = document.getElementById('lista');
+  
 
   if (!data.aulas.length) {
     lista.innerHTML = 'Nenhuma aula encontrada';
@@ -1564,8 +1561,14 @@ app.get('/admin', (req, res) => {
 
 <div class="container">
   <div id="resumo" class="resumo">Carregando resumo...</div>
-  <div id="lista">Carregando...</div>
+
+<div style="margin:10px 0;">
+  <button onclick="filtrar('todas')">Todas</button>
+  <button onclick="filtrar('pendente')">Pendentes</button>
+  <button onclick="filtrar('aceita')">Confirmadas</button>
 </div>
+
+<div id="lista">Carregando...</div>
 
 <div id="resumo" style="padding:10px; background:#e2e8f0; margin:10px; border-radius:8px;">
   Carregando resumo...
@@ -1577,12 +1580,17 @@ app.get('/admin', (req, res) => {
 async function carregar() {
   const resp = await fetch('/admin/aulas');
   const data = await resp.json();
-
+  aulasCache = data.aulas;
   const lista = document.getElementById('lista');
   const resumo = document.getElementById('resumo');
 
   lista.innerHTML = '';
-  resumo.innerHTML = '';
+  resumo.innerHTML =
+  '<div style="display:flex; gap:20px; flex-wrap:wrap;">' +
+    '<div>💰 <b>App</b><br>R$ ' + totalApp.toFixed(2) + '</div>' +
+    '<div>👨‍🏫 <b>Instrutores</b><br>R$ ' + totalInstrutor.toFixed(2) + '</div>' +
+    '<div>🚘 <b>Proprietários</b><br>R$ ' + totalProprietario.toFixed(2) + '</div>' +
+  '</div>';
 
   let totalApp = 0;
   let totalInstrutor = 0;
@@ -1608,7 +1616,12 @@ async function carregar() {
   <button onclick="filtrar('aceita')">Confirmadas</button>
 </div>
 
-  data.aulas.forEach(function(a) {
+  aulasCache
+  .filter(function(a) {
+    if (filtroAtual === 'todas') return true;
+    return a.status === filtroAtual;
+  })
+  .forEach(function(a) {
     const div = document.createElement('div');
     div.className = 'card ' + (a.status === 'aceita' ? 'ok' : 'pendente');
 
