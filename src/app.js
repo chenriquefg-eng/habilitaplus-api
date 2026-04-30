@@ -1593,9 +1593,15 @@ function filtrar(tipo) {
   renderizar();
 }
 async function aceitarAula(id) {
-  const instrutorId = prompt('Digite o ID do instrutor:');
+  const respInstrutores = await fetch('/instrutores');
+  const instrutores = await respInstrutores.json();
 
-  if (!instrutorId) return;
+  const escolha = prompt(
+    'Escolha o ID do instrutor:\n\n' +
+    instrutores.map(i => i.id + ' - ' + i.nome).join('\n')
+  );
+
+  if (!escolha) return;
 
   const resp = await fetch('/aulas/' + id + '/aceitar', {
     method: 'PUT',
@@ -1603,7 +1609,7 @@ async function aceitarAula(id) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      instrutor_id: Number(instrutorId)
+      instrutor_id: Number(escolha)
     })
   });
 
@@ -1684,4 +1690,14 @@ carregar();
 </html>
 `);
 });
+app.get('/instrutores', async (req, res) => {
+  const result = await pool.query(`
+    SELECT id, nome
+    FROM habilitaplus.instrutores
+    ORDER BY nome
+  `);
+
+  res.json(result.rows);
+});
+
 export default app;
