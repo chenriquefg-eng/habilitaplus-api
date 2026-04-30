@@ -549,12 +549,12 @@ const aluno_nome = localStorage.getItem('aluno_nome');
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            aluno_id: aluno_id,
-            data_hora: data_hora,
-            duracao: duracao,
-            valor: valor
-          })
-        });
+  aluno_id: aluno_id,
+  veiculo_id: 6,
+  data_hora: data_hora,
+  duracao: duracao,
+  valor: valor
+})
 
         const data = await resp.json();
 
