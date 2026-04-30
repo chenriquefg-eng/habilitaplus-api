@@ -1601,6 +1601,11 @@ async function carregar() {
       '<div>👨‍🏫 <b>Instrutores</b><br>R$ ' + totalInstrutor.toFixed(2) + '</div>' +
       '<div>🚘 <b>Proprietários</b><br>R$ ' + totalProprietario.toFixed(2) + '</div>' +
     '</div>';
+<div style="margin:10px 0;">
+  <button onclick="filtrar('todas')">Todas</button>
+  <button onclick="filtrar('pendente')">Pendentes</button>
+  <button onclick="filtrar('aceita')">Confirmadas</button>
+</div>
 
   data.aulas.forEach(function(a) {
     const div = document.createElement('div');
@@ -1622,7 +1627,8 @@ async function carregar() {
     lista.appendChild(div);
   });
 }
-
+let filtroAtual = 'todas';
+let aulasCache = [];
 carregar();
 </script>
 
