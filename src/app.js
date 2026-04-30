@@ -1659,16 +1659,20 @@ function renderizar() {
       const statusTexto = a.status === 'aceita' ? '✅ Confirmada' : '⏳ Pendente';
 
       div.innerHTML =
-        '<div class="linha" style="font-size:18px;"><b>🚗 Aula #' + a.id + '</b></div>' +
-        '<div class="linha"><b>Aluno:</b> ' + (a.aluno || '-') + '</div>' +
-        '<div class="linha"><b>Instrutor:</b> ' + (a.instrutor || '-') + '</div>' +
-        '<div class="linha"><b>Veículo:</b> ' + (a.veiculo || '-') + '</div>' +
-        '<div class="linha"><b>Valor:</b> R$ ' + a.valor + '</div>' +
-        '<div class="linha"><b>Status:</b> ' + statusTexto + '</div>' +
-        '<div class="linha">💸 <b>Instrutor:</b> R$ ' + (a.repasse_instrutor || 0) + '</div>' +
-        '<div class="linha">🚘 <b>Proprietário:</b> R$ ' + (a.repasse_proprietario || 0) + '</div>' +
-        '<div class="linha" style="color:#16a34a;"><b>App: R$ ' + (a.repasse_app || 0) + '</b></div>';
-+ '<button onclick="aceitarAula(' + a.id + ')" style="margin-top:10px; padding:8px; border:none; border-radius:6px; background:#16a34a; color:white; cursor:pointer;">ACEITAR</button>'
+  '<div class="linha" style="font-size:18px;"><b>🚗 Aula #' + a.id + '</b></div>' +
+  '<div class="linha"><b>Aluno:</b> ' + (a.aluno || '-') + '</div>' +
+  '<div class="linha"><b>Instrutor:</b> ' + (a.instrutor || '-') + '</div>' +
+  '<div class="linha"><b>Veículo:</b> ' + (a.veiculo || '-') + '</div>' +
+  '<div class="linha"><b>Valor:</b> R$ ' + a.valor + '</div>' +
+  '<div class="linha"><b>Status:</b> ' + statusTexto + '</div>' +
+  '<div class="linha">💸 <b>Instrutor:</b> R$ ' + (a.repasse_instrutor || 0) + '</div>' +
+  '<div class="linha">🚘 <b>Proprietário:</b> R$ ' + (a.repasse_proprietario || 0) + '</div>' +
+  '<div class="linha" style="color:#16a34a;"><b>App: R$ ' + (a.repasse_app || 0) + '</b></div>' +
+
+  (a.status === 'pendente'
+    ? '<button onclick="aceitarAula(' + a.id + ')" style="margin-top:10px; padding:8px; border:none; border-radius:6px; background:#16a34a; color:white; cursor:pointer;">ACEITAR</button>'
+    : '');
+        
       lista.appendChild(div);
     });
 }
