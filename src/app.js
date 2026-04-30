@@ -1602,15 +1602,9 @@ function filtrar(tipo) {
   renderizar();
 }
 async function aceitarAula(id) {
-  const respInstrutores = await fetch('/instrutores');
-  const instrutores = await respInstrutores.json();
+  const instrutorId = prompt('Digite o ID do instrutor:');
 
-  const escolha = prompt(
-    'Escolha o ID do instrutor:\\n\\n' +
-instrutores.map(i => i.id + ' - ' + i.nome).join('\\n')
-  );
-
-  if (!escolha) return;
+  if (!instrutorId) return;
 
   const resp = await fetch('/aulas/' + id + '/aceitar', {
     method: 'PUT',
@@ -1618,7 +1612,7 @@ instrutores.map(i => i.id + ' - ' + i.nome).join('\\n')
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      instrutor_id: Number(escolha)
+      instrutor_id: Number(instrutorId)
     })
   });
 
