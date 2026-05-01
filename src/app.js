@@ -1805,4 +1805,107 @@ carregar();
 </html>
 `);
 });
+
+app.put('/aulas/:id/status', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const { status } = req.body;
+
+  const result = await pool.query(`
+    UPDATE habilitaplus.aulas
+    SET status = $1
+    WHERE id = $2
+    RETURNING *
+  `, [status, id]);
+
+  res.json({ status: 'ok', aula: result.rows[0] });
+});
+app.get('/aula/:id', (req, res) => {
+  const id = req.params.id;
+
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Aula</title>
+
+<style>
+body { font-family: Arial; background:#f8fafc; margin:0; }
+.header { background:#1e293b; color:white; padding:15px; }
+.container { padding:15px; }
+
+.card {
+  background:white;
+  padding:15px;
+  border-radius:10px;
+}
+
+button {
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+}
+
+.btn-iniciar { background:#2563eb; color:white; }
+.btn-finalizar { background:#16a34a; color:white; }
+</style>
+</head>
+
+<body>
+
+<div class="header">Aula #${id}</div>
+
+<div class="container">
+  <div class="card">
+    <div id="info">Carregando...</div>
+
+    <button class="btn-iniciar" onclick="atualizar('em_andamento')">
+      INICIAR AULA
+    </button>
+
+    <button class="btn-finalizar" onclick="atualizar('concluida')">
+      FINALIZAR AULA
+    </button>
+  </div>
+</div>
+
+<script>
+
+const AULA_ID = ${id};
+
+async function carregar() {
+  const resp = await fetch('/admin/aulas');
+  const data = await resp.json();
+
+  const aula = data.aulas.find(a => a.id == AULA_ID);
+
+  document.getElementById('info').innerHTML =
+    'Aluno: ' + (aula.aluno || '-') + '<br>' +
+    'Instrutor: ' + (aula.instrutor || '-') + '<br>' +
+    'Status: ' + aula.status;
+}
+
+async function atualizar(novoStatus) {
+  await fetch('/aulas/' + AULA_ID + '/status', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: novoStatus })
+  });
+
+  alert('Status atualizado!');
+  carregar();
+}
+
+carregar();
+
+</script>
+
+</body>
+</html>
+`);
+});
+
 export default app;
