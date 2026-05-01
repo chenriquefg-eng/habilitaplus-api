@@ -1808,7 +1808,7 @@ carregar();
 
 app.put('/aulas/:id/status', async (req, res) => {
   const id = parseInt(req.params.id);
-  const { status } = req.body;
+  const { status, lat, lng } = req.body;
 
   let query = '';
   let values = [];
@@ -1816,24 +1816,32 @@ app.put('/aulas/:id/status', async (req, res) => {
   if (status === 'em_andamento') {
     query = `
       UPDATE habilitaplus.aulas
-      SET status = $1, inicio_real = NOW()
-      WHERE id = $2
+      SET status = $1, inicio_real = NOW(), inicio_lat = $2, inicio_lng = $3
+      WHERE id = $4
       RETURNING *
     `;
-    values = [status, id];
+    values = [status, lat || null, lng || null, id];
   } else if (status === 'concluida') {
     query = `
       UPDATE habilitaplus.aulas
-      SET status = $1, fim_real = NOW()
-      WHERE id = $2
+      SET status = $1, fim_real = NOW(), fim_lat = $2, fim_lng = $3
+      WHERE id = $4
       RETURNING *
     `;
-    values = [status, id];
+    values = [status, lat || null, lng || null, id];
+  } else {
+    return res.status(400).json({
+      status: 'erro',
+      mensagem: 'Status inválido'
+    });
   }
 
   const result = await pool.query(query, values);
 
-  res.json({ status: 'ok', aula: result.rows[0] });
+  res.json({
+    status: 'ok',
+    aula: result.rows[0]
+  });
 });
 app.get('/aula/:id', (req, res) => {
   const id = req.params.id;
