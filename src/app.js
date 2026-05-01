@@ -1608,21 +1608,22 @@ async function aceitarAula(id) {
 
   const resp = await fetch('/aulas/' + id + '/aceitar', {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       instrutor_id: Number(instrutorId)
     })
   });
 
-  if (resp.ok) {
+  const data = await resp.json();
+
+  if (data.status === 'ok') {
     alert('Aula aceita com sucesso!');
     carregar();
   } else {
-    alert('Erro ao aceitar aula');
+    alert(data.mensagem || 'Erro ao aceitar aula');
   }
 }
+
 async function carregar() {
   try {
     const resp = await fetch('/admin/aulas');
@@ -1634,9 +1635,12 @@ async function carregar() {
   } catch (err) {
     document.getElementById('resumo').innerHTML = 'Erro ao carregar resumo';
     document.getElementById('lista').innerHTML = 'Erro: ' + err.message;
-    console.error(err);
   }
 }
+
+function renderizar() {
+  const lista = document.getElementById('lista');
+  const resumo = document.getElementById('resumo');
 
   lista.innerHTML = '';
 
@@ -1671,20 +1675,19 @@ async function carregar() {
       const statusTexto = a.status === 'aceita' ? '✅ Confirmada' : '⏳ Pendente';
 
       div.innerHTML =
-  '<div class="linha" style="font-size:18px;"><b>🚗 Aula #' + a.id + '</b></div>' +
-  '<div class="linha"><b>Aluno:</b> ' + (a.aluno || '-') + '</div>' +
-  '<div class="linha"><b>Instrutor:</b> ' + (a.instrutor || '-') + '</div>' +
-  '<div class="linha"><b>Veículo:</b> ' + (a.veiculo || '-') + '</div>' +
-  '<div class="linha"><b>Valor:</b> R$ ' + a.valor + '</div>' +
-  '<div class="linha"><b>Status:</b> ' + statusTexto + '</div>' +
-  '<div class="linha">💸 <b>Instrutor:</b> R$ ' + (a.repasse_instrutor || 0) + '</div>' +
-  '<div class="linha">🚘 <b>Proprietário:</b> R$ ' + (a.repasse_proprietario || 0) + '</div>' +
-  '<div class="linha" style="color:#16a34a;"><b>App: R$ ' + (a.repasse_app || 0) + '</b></div>' +
+        '<div class="linha" style="font-size:18px;"><b>🚗 Aula #' + a.id + '</b></div>' +
+        '<div class="linha"><b>Aluno:</b> ' + (a.aluno || '-') + '</div>' +
+        '<div class="linha"><b>Instrutor:</b> ' + (a.instrutor || '-') + '</div>' +
+        '<div class="linha"><b>Veículo:</b> ' + (a.veiculo || '-') + '</div>' +
+        '<div class="linha"><b>Valor:</b> R$ ' + a.valor + '</div>' +
+        '<div class="linha"><b>Status:</b> ' + statusTexto + '</div>' +
+        '<div class="linha">💸 <b>Instrutor:</b> R$ ' + (a.repasse_instrutor || 0) + '</div>' +
+        '<div class="linha">🚘 <b>Proprietário:</b> R$ ' + (a.repasse_proprietario || 0) + '</div>' +
+        '<div class="linha" style="color:#16a34a;"><b>App: R$ ' + (a.repasse_app || 0) + '</b></div>' +
+        (a.status === 'pendente'
+          ? '<button onclick="aceitarAula(' + a.id + ')" style="margin-top:10px; padding:8px; border:none; border-radius:6px; background:#16a34a; color:white; cursor:pointer;">ACEITAR</button>'
+          : '');
 
-  (a.status === 'pendente'
-    ? '<button onclick="aceitarAula(' + a.id + ')" style="margin-top:10px; padding:8px; border:none; border-radius:6px; background:#16a34a; color:white; cursor:pointer;">ACEITAR</button>'
-    : '');
-        
       lista.appendChild(div);
     });
 }
