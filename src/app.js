@@ -1699,5 +1699,110 @@ carregar();
 </html>
 `);
 });
+app.get('/instrutor/:id/agenda', async (req, res) => {
+  const id = parseInt(req.params.id);
 
+  const result = await pool.query(`
+    SELECT 
+      a.id,
+      a.data_hora,
+      a.duracao,
+      a.status,
+      al.nome as aluno_nome,
+      v.modelo as veiculo
+    FROM habilitaplus.aulas a
+    LEFT JOIN habilitaplus.alunos al ON a.aluno_id = al.id
+    LEFT JOIN habilitaplus.veiculos v ON a.veiculo_id = v.id
+    WHERE a.instrutor_id = $1
+    AND a.status = 'aceita'
+    ORDER BY a.data_hora ASC
+  `, [id]);
+
+  res.json({ aulas: result.rows });
+});
+app.get('/agenda-instrutor', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Agenda do Instrutor</title>
+
+<style>
+body { font-family: Arial; background:#f8fafc; margin:0; }
+.header { background:#1e293b; color:white; padding:15px; }
+.container { padding:15px; }
+
+.card {
+  background:white;
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+button {
+  margin-top:8px;
+  padding:8px;
+  border:none;
+  border-radius:6px;
+  background:#2563eb;
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">Agenda do Instrutor</div>
+
+<div class="container">
+  <div id="lista">Carregando...</div>
+</div>
+
+<script>
+
+const INSTRUTOR_ID = 7; // depois vamos automatizar
+
+async function carregar() {
+  const resp = await fetch('/instrutor/' + INSTRUTOR_ID + '/agenda');
+  const data = await resp.json();
+
+  const lista = document.getElementById('lista');
+  lista.innerHTML = '';
+
+  if (!data.aulas.length) {
+    lista.innerHTML = 'Sem aulas agendadas';
+    return;
+  }
+
+  data.aulas.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'card';
+
+    const dataFormatada = new Date(a.data_hora).toLocaleString('pt-BR');
+
+    div.innerHTML =
+      '<b>Aula #' + a.id + '</b><br>' +
+      'Aluno: ' + a.aluno_nome + '<br>' +
+      'Veículo: ' + (a.veiculo || '-') + '<br>' +
+      'Data: ' + dataFormatada + '<br>' +
+      '<button onclick="abrirAula(' + a.id + ')">ABRIR</button>';
+
+    lista.appendChild(div);
+  });
+}
+
+function abrirAula(id) {
+  window.location.href = '/aula/' + id;
+}
+
+carregar();
+
+</script>
+
+</body>
+</html>
+`);
+});
 export default app;
