@@ -1810,12 +1810,28 @@ app.put('/aulas/:id/status', async (req, res) => {
   const id = parseInt(req.params.id);
   const { status } = req.body;
 
-  const result = await pool.query(`
-    UPDATE habilitaplus.aulas
-    SET status = $1
-    WHERE id = $2
-    RETURNING *
-  `, [status, id]);
+  let query = '';
+  let values = [];
+
+  if (status === 'em_andamento') {
+    query = `
+      UPDATE habilitaplus.aulas
+      SET status = $1, inicio_real = NOW()
+      WHERE id = $2
+      RETURNING *
+    `;
+    values = [status, id];
+  } else if (status === 'concluida') {
+    query = `
+      UPDATE habilitaplus.aulas
+      SET status = $1, fim_real = NOW()
+      WHERE id = $2
+      RETURNING *
+    `;
+    values = [status, id];
+  }
+
+  const result = await pool.query(query, values);
 
   res.json({ status: 'ok', aula: result.rows[0] });
 });
@@ -1885,7 +1901,9 @@ async function carregar() {
   document.getElementById('info').innerHTML =
     'Aluno: ' + (aula.aluno || '-') + '<br>' +
     'Instrutor: ' + (aula.instrutor || '-') + '<br>' +
-    'Status: ' + aula.status;
+    'Status: ' + aula.status + '<br>' +
+'Início: ' + (aula.inicio_real || '-') + '<br>' +
+'Fim: ' + (aula.fim_real || '-');
 }
 
 async function atualizar(novoStatus) {
