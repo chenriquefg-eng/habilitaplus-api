@@ -1915,14 +1915,31 @@ async function carregar() {
 }
 
 async function atualizar(novoStatus) {
-  await fetch('/aulas/' + AULA_ID + '/status', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status: novoStatus })
-  });
+  if (!navigator.geolocation) {
+    alert('GPS não disponível neste aparelho.');
+    return;
+  }
 
-  alert('Status atualizado!');
-  carregar();
+  navigator.geolocation.getCurrentPosition(async function(pos) {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+
+    await fetch('/aulas/' + AULA_ID + '/status', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: novoStatus,
+        lat: lat,
+        lng: lng
+      })
+    });
+
+    alert('Status atualizado com localização!');
+    carregar();
+
+  }, function() {
+    alert('Não foi possível obter a localização.');
+  });
 }
 
 carregar();
